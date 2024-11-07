@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 
+import '../../data/model/network_response.dart';
+import '../../data/model/task_list_model.dart';
+import '../../data/model/task_model.dart';
+import '../../data/service/network_caller.dart';
+import '../../data/utils/urls.dart';
+import '../widgets/center_circular_progress_indicator.dart';
 import '../widgets/list_of_task.dart';
+import '../widgets/snacbar_message.dart';
 import '../widgets/task_card.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
@@ -13,6 +20,8 @@ class CompletedTaskScreen extends StatefulWidget {
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
   List taskItems = [];
+  List<TaskModel> _completedTaskList = [];
+  bool _getCompletedTaskInProgress = false;
 
   bool isLoading = true;
   String status = "Completed";
@@ -29,14 +38,45 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
   void initState() {
     // TODO: implement initState
     callData();
+    _getCompletedTaskList();
     super.initState();
+  }
+
+  Future<void> _getCompletedTaskList()async{
+    _completedTaskList.clear();
+    _getCompletedTaskInProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkCaller.getRequest( url: Urls.completedTaskList);
+    _getCompletedTaskInProgress = false;
+    setState(() {});
+    if(response.isSuccess){
+      final TaskListModel taskListModel = TaskListModel.fromJson(response.responseData);
+      _completedTaskList = taskListModel.taskList?? [];
+
+
+
+    }else{
+      showSnackBarMessage(context, response.errorMessage,true);
+    }
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return  isLoading?const Center(child: CircularProgressIndicator()):RefreshIndicator(child:  ListOfTask(taskItems: taskItems,deleteItems: deleteId,statusChange: statusChangeId,), onRefresh: () async {
-      await callData();
-    });
+    return   Visibility(
+      visible: !_getCompletedTaskInProgress,
+      replacement: const CenterCircularProgressIndicator(),
+
+      child: ListView.separated(
+        itemCount: _completedTaskList.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          return  ListOfTask(taskModel:_completedTaskList[index],onRefresh: (){
+            _getCompletedTaskList();
+          },);
+        },
+      ),
+    );
   }
 
   deleteId(id){

@@ -65,7 +65,5 @@ Future<void> writeOTPVerification(otp)async{
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setString("OTPVerification", otp);
 
-
-
 }
 

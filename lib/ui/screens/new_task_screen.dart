@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:task_manager/data/model/network_response.dart';
+import 'package:task_manager/data/model/task_list_model.dart';
+import 'package:task_manager/data/model/task_model.dart';
+import 'package:task_manager/data/service/network_caller.dart';
+import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
+import 'package:task_manager/ui/widgets/snacbar_message.dart';
 
 import '../widgets/list_of_task.dart';
 import '../widgets/task_summary_card.dart';
@@ -14,54 +21,43 @@ class NewTaskScreen extends StatefulWidget {
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
   List taskItems = [];
-  List taskCountList = [];
-  bool isLoading = true;
+  List<TaskModel> _newTaskList = [];
+  bool _getNewTaskInProgress = false;
   String status = "New";
 
-  // Call to fetch both task list and task count
-  callData() async {
-    setState(() {
-      isLoading = true; // Start loading indicator
-    });
 
-   // var data = await taskListRequest("New");
-   // var data2 = await taskCountRequest();
-
-    setState(() {
-      //taskItems = data;
-      //taskCountList = data2;
-      isLoading = false; // Stop loading indicator after data is fetched
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    callData(); // Fetch data when the widget is initialized
+   _getNewTaskList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show loader when loading
-          : RefreshIndicator(
-        onRefresh: () async {
-          await callData(); // Refresh data when pulled down
-        },
-        child: Column(
+      body:  Column(
           children: [
-            _buildSummarySection(taskCountList), // Task summary section
-            Expanded(
-              child: ListOfTask(
-                taskItems: taskItems,
-                deleteItems: deleteId,
-                statusChange: statusChangeId,
+            //_buildSummarySection(taskCountList), // Task summary section
+            Visibility(
+              visible: !_getNewTaskInProgress,
+              replacement: const CenterCircularProgressIndicator(),
+            
+              child: Expanded(
+                child: ListView.separated(
+                  itemCount: _newTaskList.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    return  ListOfTask(taskModel:_newTaskList[index],onRefresh: (){
+                      _getNewTaskList();
+                    },);
+                  },
+                ),
               ),
             ),
           ],
         ),
-      ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: _onTapAddButton, // Handle add new task button
         child: const Icon(Icons.add),
@@ -99,13 +95,20 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
 
   // Function to handle adding new tasks
-  void _onTapAddButton() {
-    Navigator.push(
+  Future<void> _onTapAddButton() async {
+    final bool? shouldRefresh = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const AddNewTaskScreen(),
       ),
     );
+
+    if(shouldRefresh == true){
+      _getNewTaskList();
+
+    }
+
+
   }
 
   // Handle task deletion with confirmation dialog
@@ -121,10 +124,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               onPressed: () async {
                 Navigator.pop(context); // Close dialog
                 setState(() {
-                  isLoading = true; // Set loading state
+                  //isLoading = true; // Set loading state
                 });
                 //await taskDeleteRequest(id); // Delete the task
-                await callData(); // Refresh the data
+                //await callData(); // Refresh the data
               },
               child: const Text("Yes"),
             ),
@@ -202,10 +205,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       onPressed: () async {
                         Navigator.pop(context); // Close modal
                         setState(() {
-                          isLoading = true; // Set loading state
+                          //isLoading = true; // Set loading state
                         });
                         //await taskUpdateRequest(id, status); // Update task status
-                        await callData(); // Refresh the data
+                       // await callData(); // Refresh the data
                         setState(() {
                           status = "New"; // Reset status
                         });
@@ -222,4 +225,27 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       },
     );
   }
+
+  Future<void> _getNewTaskList()async{
+    _newTaskList.clear();
+    _getNewTaskInProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkCaller.getRequest( url: Urls.newTaskList);
+    _getNewTaskInProgress = false;
+    setState(() {});
+    if(response.isSuccess){
+      final TaskListModel taskListModel = TaskListModel.fromJson(response.responseData);
+      _newTaskList = taskListModel.taskList?? [];
+
+
+
+    }else{
+      showSnackBarMessage(context, response.errorMessage,true);
+    }
+
+  }
+
+
+
+
 }

@@ -10,12 +10,17 @@ import 'package:task_manager/ui/screens/signin_screen.dart';
 import '../model/network_response.dart';
 
 class NetworkCaller {
-  static Future<NetworkResponse> getRequest(String url) async {
+  static Future<NetworkResponse> getRequest({required String url}) async {
     Uri uri = Uri.parse(url);
     debugPrint(url);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "token": AuthController.accessToken.toString()
+    };
 
     try {
-      final Response response = await get(uri);
+      final Response response = await get(uri,headers: headers);
+      printRequest(url,null, headers);
       printResponse(url, response);
 
       if (response.statusCode == 200) {

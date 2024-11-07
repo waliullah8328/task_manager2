@@ -1,11 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/ui/screens/reset_password_screen.dart';
 import 'package:task_manager/ui/screens/signin_screen.dart';
 
 
+import '../../data/model/network_response.dart';
+import '../../data/service/network_caller.dart';
+import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
+import '../utils/utils.dart';
 import '../widgets/screen_background.dart';
+import '../widgets/snacbar_message.dart';
 
 class ForgotPasswordOtpScreen extends StatefulWidget {
   const ForgotPasswordOtpScreen({super.key});
@@ -17,7 +24,8 @@ class ForgotPasswordOtpScreen extends StatefulWidget {
 class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
 
-  bool isLoading = false;
+  bool _inProgress = false;
+  final TextEditingController _pinVerificationTEController = TextEditingController();
 
 
   final _forgotOTPFormKey = GlobalKey<FormState>();
@@ -59,39 +67,48 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
 
   Widget _buildVerifyEmailForm() {
-    return Column(
-      children: [
-        PinCodeTextField(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+    return Form(
+      key: _forgotOTPFormKey,
+      child: Column(
+        children: [
+          PinCodeTextField(
+            controller: _pinVerificationTEController,
+
+            autovalidateMode: AutovalidateMode.onUserInteraction,
 
 
 
-          length: 6,
-          obscureText: false,
-          animationType: AnimationType.fade,
-          keyboardType: TextInputType.number,
-          pinTheme: PinTheme(
-            shape: PinCodeFieldShape.box,
-            borderRadius: BorderRadius.circular(5),
-            fieldHeight: 50,
-            fieldWidth: 40,
-            activeFillColor: Colors.white,
-            inactiveFillColor: Colors.white,
-            selectedFillColor: Colors.white
+            length: 6,
+            obscureText: false,
+            animationType: AnimationType.fade,
+            keyboardType: TextInputType.number,
+            pinTheme: PinTheme(
+              shape: PinCodeFieldShape.box,
+              borderRadius: BorderRadius.circular(5),
+              fieldHeight: 50,
+              fieldWidth: 40,
+              activeFillColor: Colors.white,
+              inactiveFillColor: Colors.white,
+              selectedFillColor: Colors.white
+            ),
+            animationDuration: const Duration(milliseconds: 300),
+            backgroundColor: Colors.transparent,
+            enableActiveFill: true,
+             appContext: context,
           ),
-          animationDuration: const Duration(milliseconds: 300),
-          backgroundColor: Colors.transparent,
-          enableActiveFill: true,
-           appContext: context,
-        ),
 
-        const SizedBox(
-          height: 24,
-        ),
-        ElevatedButton(
-            onPressed: _onTapNextButton,
-            child: const Icon(Icons.arrow_circle_right_outlined)),
-      ],
+          const SizedBox(
+            height: 24,
+          ),
+          Visibility(
+            visible: !_inProgress,
+            replacement: const CircularProgressIndicator(),
+            child: ElevatedButton(
+                onPressed: _onTapNextButton,
+                child: const Icon(Icons.arrow_circle_right_outlined)),
+          ),
+        ],
+      ),
     );
   }
   Widget _buildHaveAccountSection() {
@@ -112,12 +129,46 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   }
 
   void _onTapNextButton(){
+    if(!_forgotOTPFormKey.currentState!.validate()){
+      return;
+    }
+    _forgotEmailAndOtp();
+
 
 
 
 
 
   }
+
+  Future<void> _forgotEmailAndOtp()async{
+    _inProgress = true;
+    setState(() {});
+    final String? email = await readUserData("EmailVerification");
+    var otp = _pinVerificationTEController.text.trim();
+
+    NetworkResponse response = await NetworkCaller.getRequest(url: "${Urls.forgotOTP}/$email/$otp",);
+    _inProgress = false;
+    setState(() {});
+
+    if(response.isSuccess){
+      writeOTPVerification(otp);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const ResetPasswordScreen(),));
+
+      showSnackBarMessage(context, "Successfully Submitted");
+
+    }
+    else{
+      _inProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage,true);
+
+
+    }
+
+  }
+
+
   void _onTapSignIn() {
     // TODO: implement on tap signup screen
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);

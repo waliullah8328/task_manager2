@@ -1,9 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/signin_screen.dart';
+import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
+import 'package:task_manager/ui/widgets/snacbar_message.dart';
 
 
+import '../../data/model/network_response.dart';
+import '../../data/service/network_caller.dart';
+import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
+import '../utils/utils.dart';
 import '../widgets/screen_background.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -15,10 +22,11 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
-  bool isLoading = false;
+  bool _inProgress = false;
 
 
-
+   final TextEditingController _passwordTEController = TextEditingController();
+   final TextEditingController _confirmPasswordTEController = TextEditingController();
   final _resetPasswordFormKey = GlobalKey<FormState>();
 
 
@@ -64,6 +72,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       child: Column(
         children: [
           TextFormField(
+            controller: _passwordTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value){
               if(value!.isEmpty){
@@ -86,6 +95,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             height: 8,
           ),
           TextFormField(
+            controller: _confirmPasswordTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value){
               if(value!.isEmpty){
@@ -108,9 +118,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           const SizedBox(
             height: 24,
           ),
-          ElevatedButton(
-              onPressed:_onTapNextButton,
-              child: const Icon(Icons.arrow_circle_right_outlined)),
+          Visibility(
+            visible: !_inProgress,
+            replacement: const CenterCircularProgressIndicator(),
+            child: ElevatedButton(
+                onPressed:_onTapNextButton,
+                child: const Icon(Icons.arrow_circle_right_outlined)),
+          ),
         ],
       ),
     );
@@ -140,9 +154,45 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if(!_resetPasswordFormKey.currentState!.validate()){
       return;
     }
+    if(_passwordTEController.text == _confirmPasswordTEController.text){
+      _resetPassword();
 
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+
+
+    }else{
+      showSnackBarMessage(context, "Please input same password!",true);
+    }
+
+
+
 
   }
+
+  Future<void> _resetPassword()async{
+    _inProgress = true;
+    setState(() {});
+    final String? email = await readUserData("EmailVerification");
+    final String? otp = await readUserData("OTPVerification");
+    Map<String, dynamic> requestBody = {
+      "email":email,
+      "OTP": otp,
+      "password":_passwordTEController.text
+    };
+    final NetworkResponse response = await NetworkCaller.postRequest(url: Urls.recoverResetPassword,body: requestBody);
+    _inProgress = false;
+    setState(() {});
+    if(response.isSuccess){
+
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+
+    }
+    else{
+      showSnackBarMessage(context, response.errorMessage,true);
+    }
+
+
+
+  }
+
 }

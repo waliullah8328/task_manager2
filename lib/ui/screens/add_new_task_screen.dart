@@ -21,6 +21,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
 
 
   bool _addNewTaskInProgress = false;
+  bool _shouldRefreshPreviousPage = false;
 
   final TextEditingController _titleTEController = TextEditingController();
   final TextEditingController _descriptionTEController = TextEditingController();
@@ -36,70 +37,80 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      //appBar: TaskManagerAppBar(profileData: profileData,),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 42,),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (result){
+       if(result){
+         return;
+       }
+        Navigator.pop(context,_shouldRefreshPreviousPage);
 
-              Text("Add New Task",style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),),
-              const SizedBox(height: 24,),
-              Form(
-                key: _addNewFormKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _titleTEController,
-                      //autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (String? value){
-                        if(value?.trim().isEmpty ?? true){
-                          return "Title is required";
-
-                        }
-                        return null;
-                      },
-
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        hintText: "Title"
+      },
+      child: Scaffold(
+        appBar: TaskManagerAppBar(),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 42,),
+      
+                Text("Add New Task",style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),),
+                const SizedBox(height: 24,),
+                Form(
+                  key: _addNewFormKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _titleTEController,
+                        //autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value){
+                          if(value?.trim().isEmpty ?? true){
+                            return "Title is required";
+      
+                          }
+                          return null;
+                        },
+      
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                          hintText: "Title"
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8,),
-                    TextFormField(
-                      controller: _descriptionTEController,
-                      maxLines: 5,
-                      //autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (String? value){
-                        if(value?.isEmpty ?? true){
-                          return "Description is required";
-
-                        }
-                        return null;
-                      },
-
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                          hintText: "Decription"
+                      const SizedBox(height: 8,),
+                      TextFormField(
+                        controller: _descriptionTEController,
+                        maxLines: 5,
+                        //autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (String? value){
+                          if(value?.isEmpty ?? true){
+                            return "Description is required";
+      
+                          }
+                          return null;
+                        },
+      
+                        keyboardType: TextInputType.text,
+                        decoration: const InputDecoration(
+                            hintText: "Decription"
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16,),
-                    Visibility(
-                      visible: !_addNewTaskInProgress,
-                        replacement: const CenterCircularProgressIndicator(),
-                        child: ElevatedButton(onPressed: _addButton, child: const Icon(Icons.arrow_circle_right_outlined))),
-                  ],
+                      const SizedBox(height: 16,),
+                      Visibility(
+                        visible: !_addNewTaskInProgress,
+                          replacement: const CenterCircularProgressIndicator(),
+                          child: ElevatedButton(onPressed: _addButton, child: const Icon(Icons.arrow_circle_right_outlined))),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      
       ),
-
     );
   }
 
@@ -111,6 +122,8 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     _addNewTask();
 
   }
+
+
 
 
   Future<void> _addNewTask()async{
@@ -126,6 +139,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     setState(() {});
 
     if(response.isSuccess){
+      _shouldRefreshPreviousPage = true;
       _clearTextFields();
       showSnackBarMessage(context, "New task added");
 

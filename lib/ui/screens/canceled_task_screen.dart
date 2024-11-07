@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../data/model/network_response.dart';
+import '../../data/model/task_list_model.dart';
+import '../../data/model/task_model.dart';
+import '../../data/service/network_caller.dart';
+import '../../data/utils/urls.dart';
+import '../widgets/center_circular_progress_indicator.dart';
 import '../widgets/list_of_task.dart';
-import '../widgets/task_card.dart';
+import '../widgets/snacbar_message.dart';
+
 
 class CanceledTaskScreen extends StatefulWidget {
   const CanceledTaskScreen({super.key});
@@ -13,6 +20,8 @@ class CanceledTaskScreen extends StatefulWidget {
 class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
 
   List taskItems = [];
+  List<TaskModel> _canceledTaskList = [];
+  bool _getCanceledTaskInProgress = false;
   bool isLoading = true;
   String status = "Canceled";
 
@@ -29,14 +38,46 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
   void initState() {
     // TODO: implement initState
     callData();
+    _getCanceledTaskList();
     super.initState();
+  }
+
+  Future<void> _getCanceledTaskList()async{
+    _canceledTaskList.clear();
+    _getCanceledTaskInProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkCaller.getRequest( url: Urls.canceledTaskList);
+    _getCanceledTaskInProgress = false;
+    setState(() {});
+    if(response.isSuccess){
+      final TaskListModel taskListModel = TaskListModel.fromJson(response.responseData);
+      _canceledTaskList = taskListModel.taskList?? [];
+
+
+
+    }else{
+      showSnackBarMessage(context, response.errorMessage,true);
+    }
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return isLoading?const Center(child: CircularProgressIndicator()):RefreshIndicator(child:  ListOfTask(taskItems: taskItems,deleteItems: deleteId,statusChange: statusChangeId,), onRefresh: () async {
-      await callData();
-    });
+    return Visibility(
+      visible: !_getCanceledTaskInProgress,
+      replacement: const CenterCircularProgressIndicator(),
+
+      child: ListView.separated(
+        itemCount: _canceledTaskList.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          return  ListOfTask(taskModel:_canceledTaskList[index],onRefresh: (){
+            _getCanceledTaskList();
+
+          },);
+        },
+      ),
+    );
   }
 
   deleteId(id){
