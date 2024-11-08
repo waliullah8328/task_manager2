@@ -14,5 +14,7 @@ class Urls{
   static const recoverResetPassword = "$_baseUrl/RecoverResetPassword";
   static updateTaskStatus(String taskId, String status) => "$_baseUrl/updateTaskStatus/$taskId/$status";
   static deleteTask(String taskId) => "$_baseUrl/deleteTask/$taskId";
+  static const taskStatusCount = "$_baseUrl/taskStatusCount";
+  static const profileUpdate = "$_baseUrl/ProfileUpdate";
 
 }

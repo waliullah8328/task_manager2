@@ -6,6 +6,7 @@ import 'package:task_manager/ui/screens/signup_screen.dart';
 
 
 
+import '../../data/model/login_model.dart';
 import '../../data/model/network_response.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
@@ -183,7 +184,9 @@ class _SignInScreenState extends State<SignInScreen> {
     _inProgress = false;
     setState(() {});
     if(response.isSuccess){
-      await AuthController.saveAccessToken(response.responseData["token"]);
+      LoginModel loginModel = LoginModel.fromJson(response.responseData);
+      await AuthController.saveAccessToken(loginModel.token!);
+      await AuthController.saveUserData(loginModel.data!);
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainBottomNavBarScreen(),), (route) => false);
 
     }

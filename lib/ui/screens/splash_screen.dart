@@ -32,7 +32,9 @@ class SplashScreen extends StatefulWidget {
     Timer(const Duration(seconds: 3), () async {
       await AuthController.getAccessToken(); // For get Token
 
+
       if(AuthController.isLogin()){
+        await AuthController.getUserData();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
