@@ -1,21 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controllers/sign_in_controller.dart';
+import 'package:task_manager/ui/screens/main_bottom_nav_bar_screen.dart';
 import 'package:task_manager/ui/screens/signup_screen.dart';
-
-
-
-
-import '../../data/model/login_model.dart';
-import '../../data/model/network_response.dart';
-import '../../data/service/network_caller.dart';
-import '../../data/utils/urls.dart';
-import '../controllers/auth_controller.dart';
+import 'package:task_manager/ui/widgets/snacbar_message.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
-import '../widgets/snacbar_message.dart';
 import 'forgot_password_email_screen.dart';
-import 'main_bottom_nav_bar_screen.dart';
+
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -28,9 +22,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
 
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
-   bool _inProgress = false;
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
+  final controller = Get.find<SignInController>();
 
 
 
@@ -129,7 +123,7 @@ class _SignInScreenState extends State<SignInScreen> {
             height: 24,
           ),
           Visibility(
-             visible: !_inProgress,
+             visible: !controller.inProgress,
             replacement: const Center(child: CircularProgressIndicator(),),
             child: ElevatedButton(
                 onPressed: _onTapNextButton,
@@ -173,30 +167,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   }
 
-  Future<void> _signIn()async{
-    _inProgress = true;
-    setState(() {});
-    Map<String, dynamic> requestBody = {
-      "email":_emailTEController.text.trim(),
-      "password":_passwordTEController.text
-    };
-    final NetworkResponse response = await NetworkCaller.postRequest(url: Urls.login,body: requestBody);
-    _inProgress = false;
-    setState(() {});
-    if(response.isSuccess){
-      LoginModel loginModel = LoginModel.fromJson(response.responseData);
-      await AuthController.saveAccessToken(loginModel.token!);
-      await AuthController.saveUserData(loginModel.data!);
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainBottomNavBarScreen(),), (route) => false);
 
-    }
-    else{
-      showSnackBarMessage(context, response.errorMessage,true);
-    }
-
-
-
-  }
   void _onTapForgotPasswordButton() {
     // TODO: implement on tap forgot password
     Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordEmailScreen(),));
@@ -208,5 +179,19 @@ class _SignInScreenState extends State<SignInScreen> {
         MaterialPageRoute(
           builder: (context) => const SignUpScreen(),
         ));
+  }
+
+  Future<void> _signIn() async {
+
+    final bool result = await Get.find<SignInController>().signIn(_emailTEController.text.trim(), _passwordTEController.text);
+
+
+    if (result) {
+      Get.offNamed(MainBottomNavBarScreen.name);
+
+    } else {
+      showSnackBarMessage(context,Get.find<SignInController>().errorMessage!,true );
+    }
+
   }
 }

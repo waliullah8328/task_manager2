@@ -14,6 +14,7 @@ import 'main_bottom_nav_bar_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
+  static const String name = "/";
    const SplashScreen({super.key});
 
    @override
