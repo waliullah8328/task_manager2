@@ -1,33 +1,23 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controllers/reset_password_controller.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
-
-
-import '../../data/model/network_response.dart';
-import '../../data/service/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
-import '../utils/utils.dart';
 import '../widgets/screen_background.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
-
-  @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
-}
-
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-
-  bool _inProgress = false;
+class ResetPasswordScreen extends StatelessWidget {
+   ResetPasswordScreen({super.key});
 
 
+
+
+  final _resetPasswordFormKey = GlobalKey<FormState>();
    final TextEditingController _passwordTEController = TextEditingController();
    final TextEditingController _confirmPasswordTEController = TextEditingController();
-  final _resetPasswordFormKey = GlobalKey<FormState>();
+  final controller = Get.find<ResetPasswordController>();
 
 
   @override
@@ -49,12 +39,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   const SizedBox(
                     height: 24,
                   ),
-                  _buildResetPasswordForm(),
+                  _buildResetPasswordForm(context),
                   const SizedBox(
                     height: 48,
                   ),
                   Center(
-                    child: _buildHaveAccountSection(),
+                    child: _buildHaveAccountSection(context),
                   ),
 
 
@@ -66,7 +56,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
 
-  Widget _buildResetPasswordForm() {
+  Widget _buildResetPasswordForm(BuildContext context) {
     return Form(
       key: _resetPasswordFormKey,
       child: Column(
@@ -79,7 +69,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 return "Password is required";
 
               }
-              if(value!.length <= 6){
+              if(value.length <= 6){
                 return "Password should be 6 character";
               }
               return null;
@@ -102,7 +92,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 return "Password is required";
 
               }
-              if(value!.length <= 6){
+              if(value.length <= 6){
                 return "Password should be 6 character";
               }
               return null;
@@ -118,18 +108,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           const SizedBox(
             height: 24,
           ),
-          Visibility(
-            visible: !_inProgress,
+          Obx(() => Visibility(
+            visible: !controller.inProgress,
             replacement: const CenterCircularProgressIndicator(),
             child: ElevatedButton(
-                onPressed:_onTapNextButton,
+                onPressed:()=>_onTapNextButton(context),
                 child: const Icon(Icons.arrow_circle_right_outlined)),
-          ),
+          )),
         ],
       ),
     );
   }
-  Widget _buildHaveAccountSection() {
+  Widget _buildHaveAccountSection(BuildContext context) {
     return RichText(
         text: TextSpan(
             style: const TextStyle(
@@ -142,20 +132,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               TextSpan(
                   text: "Sign In",
                   style: const TextStyle(color: AppColors.themeColor),
-                  recognizer: TapGestureRecognizer()..onTap = _onTapSignIn)
+                  recognizer: TapGestureRecognizer()..onTap = ()=>_onTapSignIn(context))
             ]));
   }
-  void _onTapSignIn() {
+  void _onTapSignIn(BuildContext context) {
     // TODO: implement on tap signup screen
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
   }
 
-  void _onTapNextButton(){
+  void _onTapNextButton(BuildContext context){
     if(!_resetPasswordFormKey.currentState!.validate()){
       return;
     }
     if(_passwordTEController.text == _confirmPasswordTEController.text){
-      _resetPassword();
+      _resetPassword(context);
 
 
 
@@ -169,26 +159,31 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   }
 
-  Future<void> _resetPassword()async{
-    _inProgress = true;
-    setState(() {});
-    final String? email = await readUserData("EmailVerification");
-    final String? otp = await readUserData("OTPVerification");
-    Map<String, dynamic> requestBody = {
-      "email":email,
-      "OTP": otp,
-      "password":_passwordTEController.text
-    };
-    final NetworkResponse response = await NetworkCaller.postRequest(url: Urls.recoverResetPassword,body: requestBody);
-    _inProgress = false;
-    setState(() {});
-    if(response.isSuccess){
+  Future<void> _resetPassword(BuildContext context)async{
+    final bool result = await controller.resetPassword(password: _passwordTEController.text);
+    if(result){
+      Get.offAll(()=> SignInScreen());
+      Get.showSnackbar(
+        const GetSnackBar(
+          title: "Success",
+          message: "Reset Password Successfully",
+          duration: Duration(seconds: 3),
+        ),
+      );
 
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
+
+      //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
 
     }
     else{
-      showSnackBarMessage(context, response.errorMessage,true);
+      Get.showSnackbar(
+        GetSnackBar(
+          title: "Error",
+          message: controller.errorMessage,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+     // showSnackBarMessage(context, controller.errorMessage.toString(),true);
     }
 
 

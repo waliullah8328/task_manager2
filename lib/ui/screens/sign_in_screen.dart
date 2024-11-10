@@ -12,10 +12,13 @@ import 'forgot_password_email_screen.dart';
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
+  // Private form key and controllers
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
-  final controller = Get.find<SignInController>();
+
+  // Private instance of SignInController
+  final SignInController _controller = Get.find<SignInController>();
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +60,7 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
+  // Private widget for sign-in form
   Widget _buildSignInForm(BuildContext context) {
     return Form(
       key: _loginFormKey,
@@ -83,7 +87,7 @@ class SignInScreen extends StatelessWidget {
                 return "Password is required";
               }
               if (value!.length <= 6) {
-                return "Password should be 6 characters";
+                return "Password should be at least 6 characters";
               }
               return null;
             },
@@ -91,20 +95,20 @@ class SignInScreen extends StatelessWidget {
             decoration: const InputDecoration(hintText: "Password"),
           ),
           const SizedBox(height: 24),
-           Visibility(
-              visible: !controller.inProgress,
-              replacement: const Center(child: CircularProgressIndicator()),
-              child: ElevatedButton(
-                onPressed: () => _onTapNextButton(context),
-                child: const Icon(Icons.arrow_circle_right_outlined),
-              ),
+          Obx(() => Visibility(
+            visible: !_controller.inProgress,
+            replacement: const Center(child: CircularProgressIndicator()),
+            child: ElevatedButton(
+              onPressed: () => _onTapNextButton(context),
+              child: const Icon(Icons.arrow_circle_right_outlined),
             ),
-
+          )),
         ],
       ),
     );
   }
 
+  // Private widget for sign-up section
   Widget _buildSignUpSection(BuildContext context) {
     return RichText(
       text: TextSpan(
@@ -126,6 +130,7 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
+  // Private methods for button taps
   void _onTapNextButton(BuildContext context) {
     if (!_loginFormKey.currentState!.validate()) return;
     _signIn(context);
@@ -134,27 +139,28 @@ class SignInScreen extends StatelessWidget {
   void _onTapForgotPasswordButton(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>  ForgotPasswordEmailScreen()),
+      MaterialPageRoute(builder: (context) => ForgotPasswordEmailScreen()),
     );
   }
 
   void _onTapSignUp(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>  SignUpScreen()),
+      MaterialPageRoute(builder: (context) => SignUpScreen()),
     );
   }
 
+  // Private method for handling sign-in logic
   Future<void> _signIn(BuildContext context) async {
-    final bool result = await controller.signIn(
+    final bool result = await _controller.signIn(
       _emailTEController.text.trim(),
       _passwordTEController.text,
     );
 
     if (result) {
-      Get.offNamed(MainBottomNavBarScreen.name);
+      Get.off(MainBottomNavBarScreen());
     } else {
-      showSnackBarMessage(context, controller.errorMessage ?? "Error", true);
+      showSnackBarMessage(context, _controller.errorMessage, true);
     }
   }
 }

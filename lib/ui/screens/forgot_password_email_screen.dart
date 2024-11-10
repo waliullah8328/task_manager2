@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:task_manager/ui/controllers/forgot_email_controller.dart';
 import 'package:task_manager/ui/screens/forgot_password_otp_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
@@ -11,6 +12,7 @@ import '../widgets/snack_bar_message.dart';
 class ForgotPasswordEmailScreen extends StatelessWidget {
   ForgotPasswordEmailScreen({super.key});
 
+  final TextEditingController _emailTEController = TextEditingController();
   final _forgotEmailFormKey = GlobalKey<FormState>();
   final controller = Get.find<ForgotEmailController>();
 
@@ -56,7 +58,7 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
-            controller: controller.emailTEController,
+            controller: _emailTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value!.isEmpty) {
@@ -68,14 +70,14 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
             decoration: const InputDecoration(hintText: "Email"),
           ),
           const SizedBox(height: 24),
-          Visibility(
+          Obx(() => Visibility(
             visible: !controller.inProgress,
             replacement: const CenterCircularProgressIndicator(),
             child: ElevatedButton(
               onPressed: () => _onTapNextButton(context),
               child: const Icon(Icons.arrow_circle_right_outlined),
             ),
-          ),
+          )),
         ],
       ),
     );
@@ -114,10 +116,10 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
   }
 
   Future<void> _forgotEmail(BuildContext context) async {
-    final bool result = await controller.forgotEmail();
+    final bool result = await controller.forgotEmail(email:_emailTEController.text.trim());
 
     if (result) {
-      Get.to(() => const ForgotPasswordOtpScreen());
+      Get.to(() =>  ForgotPasswordOtpScreen());
       showSnackBarMessage(context, "Successfully Submitted");
     } else {
       showSnackBarMessage(context, controller.errorMessage ?? "Error", true);
