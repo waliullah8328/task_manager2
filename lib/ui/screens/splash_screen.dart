@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:task_manager/ui/screens/signin_screen.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 
 
 
@@ -47,7 +47,7 @@ class SplashScreen extends StatefulWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const SignInScreen(),
+            builder: (context) =>  SignInScreen(),
           ),
         );
 

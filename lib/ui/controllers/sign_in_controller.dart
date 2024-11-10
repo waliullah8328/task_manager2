@@ -1,11 +1,8 @@
 import 'package:get/get.dart';
-import 'package:task_manager/ui/screens/main_bottom_nav_bar_screen.dart';
-
 import '../../data/model/login_model.dart';
 import '../../data/model/network_response.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
-import '../widgets/snacbar_message.dart';
 import 'auth_controller.dart';
 
 class SignInController extends GetxController {

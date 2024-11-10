@@ -5,7 +5,7 @@ import 'package:task_manager/data/model/network_response.dart';
 import 'package:task_manager/data/service/network_caller.dart';
 import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/snacbar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 import '../widgets/task_manager_app_bar.dart';
 

@@ -8,7 +8,7 @@ import 'package:task_manager/data/model/task_status_model.dart';
 import 'package:task_manager/data/service/network_caller.dart';
 import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/snacbar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 import '../widgets/list_of_task.dart';
 import '../widgets/task_summary_card.dart';

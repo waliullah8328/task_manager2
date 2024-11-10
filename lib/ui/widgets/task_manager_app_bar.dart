@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../controllers/auth_controller.dart';
 import '../screens/profile_screen.dart';
-import '../screens/signin_screen.dart';
+import '../screens/sign_in_screen.dart';
 import '../utils/app_colors.dart';
 
 
@@ -65,7 +65,7 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
                 await AuthController.clearUserData();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignInScreen()),
+                  MaterialPageRoute(builder: (context) =>  SignInScreen()),
                       (route) => false,
                 );
               },

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart'; // Importing intl for date formatting
 import 'package:task_manager/data/model/network_response.dart';
 import 'package:task_manager/data/model/task_model.dart';
 import 'package:task_manager/data/service/network_caller.dart';
-import 'package:task_manager/ui/widgets/snacbar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';

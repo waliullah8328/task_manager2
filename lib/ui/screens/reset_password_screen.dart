@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/screens/signin_screen.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/snacbar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 
 import '../../data/model/network_response.dart';
@@ -147,7 +147,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
   void _onTapSignIn() {
     // TODO: implement on tap signup screen
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
   }
 
   void _onTapNextButton(){
@@ -184,7 +184,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() {});
     if(response.isSuccess){
 
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
 
     }
     else{

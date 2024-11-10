@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager/ui/screens/reset_password_screen.dart';
-import 'package:task_manager/ui/screens/signin_screen.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 
 
 import '../../data/model/network_response.dart';
@@ -12,7 +12,7 @@ import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
 import '../utils/utils.dart';
 import '../widgets/screen_background.dart';
-import '../widgets/snacbar_message.dart';
+import '../widgets/snack_bar_message.dart';
 
 class ForgotPasswordOtpScreen extends StatefulWidget {
   const ForgotPasswordOtpScreen({super.key});
@@ -171,6 +171,6 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
   void _onTapSignIn() {
     // TODO: implement on tap signup screen
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SignInScreen(),), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
   }
 }

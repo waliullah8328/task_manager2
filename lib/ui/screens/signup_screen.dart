@@ -1,37 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/screens/signin_screen.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/screens/sign_in_screen.dart';
 
-
-import '../../data/model/network_response.dart';
-import '../../data/service/network_caller.dart';
-import '../../data/utils/urls.dart';
+import '../controllers/sign_up_controller.dart';
 import '../utils/app_colors.dart';
 import '../widgets/center_circular_progress_indicator.dart';
 import '../widgets/screen_background.dart';
-import '../widgets/snacbar_message.dart';
+import '../widgets/snack_bar_message.dart';
 
-
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
-
-  @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
-
-
+class SignUpScreen extends StatelessWidget {
+  SignUpScreen({super.key});
 
   final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
-  final TextEditingController _emailTEController = TextEditingController();
-  final TextEditingController _firstNameTEController = TextEditingController();
-  final TextEditingController _lastNameTEController = TextEditingController();
-  final TextEditingController _mobileTEController = TextEditingController();
-  final TextEditingController _passwordTEController = TextEditingController();
-   bool _inProgress = false;
-
+  final controller = Get.find<SignUpController>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,43 +27,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 82,),
-                  Text("Join With Us",style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w500),),
+                  const SizedBox(
+                    height: 82,
+                  ),
+                  Text(
+                    "Join With Us",
+                    style: textTheme.displaySmall
+                        ?.copyWith(fontWeight: FontWeight.w500),
+                  ),
                   const SizedBox(
                     height: 24,
                   ),
-                  _buildSignUpForm(),
+                  _buildSignUpForm(context),
                   const SizedBox(
                     height: 24,
                   ),
                   Center(
-                    child: _buildHaveAccountSection(),
+                    child: _buildHaveAccountSection(context),
                   ),
-
-
-
-                ],),
+                ],
+              ),
             ),
           )),
     );
   }
 
-
-  Widget _buildSignUpForm() {
+  Widget _buildSignUpForm(BuildContext context) {
     return Form(
       key: _signUpFormKey,
       child: Column(
         children: [
           TextFormField(
-            controller: _emailTEController,
+            controller: controller.emailTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value){
-              if(value?.isEmpty ?? true){
+            validator: (String? value) {
+              if (value?.isEmpty ?? true) {
                 return "Email is required";
               }
               return null;
             },
-
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(hintText: "Email"),
           ),
@@ -89,15 +73,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             height: 8,
           ),
           TextFormField(
-            controller: _firstNameTEController,
+            controller: controller.firstNameTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value){
-              if(value?.isEmpty ?? true){
+            validator: (String? value) {
+              if (value?.isEmpty ?? true) {
                 return "First Name is required";
               }
               return null;
             },
-
             keyboardType: TextInputType.name,
             decoration: const InputDecoration(hintText: "First Name"),
           ),
@@ -105,15 +88,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             height: 8,
           ),
           TextFormField(
-            controller: _lastNameTEController,
+            controller: controller.lastNameTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value){
-              if(value?.isEmpty ?? true){
+            validator: (String? value) {
+              if (value?.isEmpty ?? true) {
                 return "Last Name is required";
               }
               return null;
             },
-
             keyboardType: TextInputType.name,
             decoration: const InputDecoration(hintText: "Last Name"),
           ),
@@ -121,19 +103,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
             height: 8,
           ),
           TextFormField(
-            controller: _mobileTEController,
+            controller: controller.mobileTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String?value){
-              if(value?.isEmpty ?? true){
+            validator: (String? value) {
+              if (value?.isEmpty ?? true) {
                 return "Mobile Number is required";
               }
-              if(value!.length != 11){
+              if (value!.length != 11) {
                 return "Number should be 11 digits (01*********)";
-
               }
               return null;
             },
-
             keyboardType: TextInputType.phone,
             decoration: const InputDecoration(hintText: "Mobile Number"),
           ),
@@ -141,39 +121,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
             height: 8,
           ),
           TextFormField(
-            controller: _passwordTEController,
+            controller: controller.passwordTEController,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (String? value){
-              if(value?.isEmpty ?? true){
+            validator: (String? value) {
+              if (value?.isEmpty ?? true) {
                 return "Password is required";
-
               }
-              if(value!.length <= 6){
-                return "Password should be 6 character";
+              if (value!.length <= 6) {
+                return "Password should be 6 characters";
               }
               return null;
             },
-
             obscureText: true,
-
-
             decoration: const InputDecoration(hintText: "Password"),
           ),
           const SizedBox(
             height: 24,
           ),
           Visibility(
-            visible: !_inProgress,
+            visible: !controller.inProgress,
             replacement: const CenterCircularProgressIndicator(),
             child: ElevatedButton(
-                onPressed: _onTapNextButton,
-                child: const Icon(Icons.arrow_circle_right_outlined)),
+              onPressed: () => _onTapNextButton(context),
+              child: const Icon(Icons.arrow_circle_right_outlined),
+            ),
           ),
         ],
       ),
     );
   }
-  Widget _buildHaveAccountSection() {
+
+  Widget _buildHaveAccountSection(BuildContext context) {
     return RichText(
         text: TextSpan(
             style: const TextStyle(
@@ -189,70 +167,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   recognizer: TapGestureRecognizer()..onTap = _onTapSignIn)
             ]));
   }
+
   void _onTapSignIn() {
-    // TODO: implement on tap signup screen
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SignInScreen(),
-        ));
+    Get.to(() => SignInScreen());
   }
 
-  void _onTapNextButton() {
-
-    if(!_signUpFormKey.currentState!.validate()){
+  void _onTapNextButton(BuildContext context) {
+    if (!_signUpFormKey.currentState!.validate()) {
       return;
     }
-    _signUp();
-
+    _signUp(context);
   }
 
+  Future<void> _signUp(BuildContext context) async {
+    final bool result = await controller.signUp(
 
-  Future<void> _signUp()async{
-    _inProgress = true;
-    setState(() {});
-    Map<String, dynamic>requestBody = {
-      "email":_emailTEController.text.trim(),
-      "firstName":_firstNameTEController.text.trim(),
-      "lastName":_lastNameTEController.text.trim(),
-      "mobile":_mobileTEController.text.trim(),
-      "password":_passwordTEController.text
+    );
 
-    };
-    NetworkResponse response = await NetworkCaller.postRequest(url: Urls.registration,body: requestBody);
-    _inProgress = false;
-    setState(() {});
-
-    if(response.isSuccess){
-      clearTextFields();
+    if (result) {
       showSnackBarMessage(context, "New user is created");
-
+      Get.to(() => SignInScreen());
+    } else {
+      showSnackBarMessage(context, controller.errorMessage ?? "Error", true);
     }
-    else{
-      _inProgress = false;
-      setState(() {});
-      showSnackBarMessage(context, response.errorMessage,true);
-
-
-    }
-
-  }
-
-  void clearTextFields(){
-    _emailTEController.clear();
-    _firstNameTEController.clear();
-    _lastNameTEController.clear();
-    _mobileTEController.clear();
-    _passwordTEController.clear();
-  }
-
-  @override
-  void dispose() {
-    _emailTEController.dispose();
-    _firstNameTEController.dispose();
-    _lastNameTEController.dispose();
-    _mobileTEController.dispose();
-    _passwordTEController.dispose();
-    super.dispose();
   }
 }

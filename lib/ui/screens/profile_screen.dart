@@ -6,7 +6,7 @@ import 'package:task_manager/data/model/user_model.dart';
 import 'package:task_manager/data/service/network_caller.dart';
 import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/controllers/auth_controller.dart';
-import 'package:task_manager/ui/widgets/snacbar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 import '../widgets/task_manager_app_bar.dart';
 
