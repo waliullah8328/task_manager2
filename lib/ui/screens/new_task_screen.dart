@@ -11,7 +11,7 @@ class NewTaskScreen extends StatelessWidget {
   NewTaskScreen({super.key});
 
   final NewTaskListController _controller = Get.find<NewTaskListController>();
-  final String status = "New";
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,107 +96,5 @@ class NewTaskScreen extends StatelessWidget {
     }
   }
 
-  void deleteId(BuildContext context, String id) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Delete!"),
-          content: const Text("Once you delete it, you can't get it back!"),
-          actions: [
-            OutlinedButton(
-              onPressed: () async {
-                Navigator.pop(context); // Close dialog
-                // Add your delete functionality here
-              },
-              child: const Text("Yes"),
-            ),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-              },
-              child: const Text("No"),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  void statusChangeId(BuildContext context, String id) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        String localStatus = status; // Define a local status variable
-
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Container(
-              padding: const EdgeInsets.all(30),
-              height: 370,
-              child: Column(
-                children: [
-                  // Radio buttons for status selection
-                  RadioListTile(
-                    value: "New",
-                    groupValue: localStatus,
-                    title: const Text("New"),
-                    onChanged: (value) {
-                      setModalState(() {
-                        localStatus = value.toString();
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    value: "Progress",
-                    groupValue: localStatus,
-                    title: const Text("Progress"),
-                    onChanged: (value) {
-                      setModalState(() {
-                        localStatus = value.toString();
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    value: "Completed",
-                    groupValue: localStatus,
-                    title: const Text("Completed"),
-                    onChanged: (value) {
-                      setModalState(() {
-                        localStatus = value.toString();
-                      });
-                    },
-                  ),
-                  RadioListTile(
-                    value: "Canceled",
-                    groupValue: localStatus,
-                    title: const Text("Canceled"),
-                    onChanged: (value) {
-                      setModalState(() {
-                        localStatus = value.toString();
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  // Confirm button
-                  SizedBox(
-                    width: 200,
-                    height: 45,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(context); // Close modal
-                        _controller.getTaskStatusCount(); // Refresh the task status count
-                        // Add your status update functionality here
-                      },
-                      child: const Text("Confirm"),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 }

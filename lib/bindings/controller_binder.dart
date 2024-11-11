@@ -8,7 +8,9 @@ import 'package:task_manager/ui/controllers/sign_in_controller.dart';
 import 'package:task_manager/ui/controllers/sign_up_controller.dart';
 
 import '../ui/controllers/bottom_navbar_controller.dart';
+import '../ui/controllers/cancel_task_controller.dart';
 import '../ui/controllers/forgot_email_controller.dart';
+import '../ui/controllers/progress_task_controller.dart';
 
 class ControllerBinders extends Bindings{
   @override
@@ -22,6 +24,8 @@ class ControllerBinders extends Bindings{
     Get.put(NewTaskListController());
     Get.put(AddNewTaskController());
     Get.put(CompletedTaskController());
+    Get.put(CancelTaskController());
+    Get.put(ProgressTaskController());
 
   }
 
