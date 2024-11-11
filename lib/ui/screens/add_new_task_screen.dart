@@ -1,33 +1,25 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:task_manager/data/model/network_response.dart';
-import 'package:task_manager/data/service/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/controllers/add_new_task_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
-
 import '../widgets/task_manager_app_bar.dart';
 
 
-class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key});
-
-  @override
-  State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
-}
-
-class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
+class AddNewTaskScreen extends StatelessWidget {
+   AddNewTaskScreen({super.key});
 
 
-  bool _addNewTaskInProgress = false;
-  bool _shouldRefreshPreviousPage = false;
+
+
+
 
   final TextEditingController _titleTEController = TextEditingController();
   final TextEditingController _descriptionTEController = TextEditingController();
 
 
   final GlobalKey<FormState> _addNewFormKey = GlobalKey<FormState>();
+  final _controller = Get.find<AddNewTaskController>();
 
 
 
@@ -43,7 +35,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
        if(result){
          return;
        }
-        Navigator.pop(context,_shouldRefreshPreviousPage);
+        Navigator.pop(context,_controller.shouldRefreshPreviousPage);
 
       },
       child: Scaffold(
@@ -98,10 +90,12 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                         ),
                       ),
                       const SizedBox(height: 16,),
-                      Visibility(
-                        visible: !_addNewTaskInProgress,
-                          replacement: const CenterCircularProgressIndicator(),
-                          child: ElevatedButton(onPressed: _addButton, child: const Icon(Icons.arrow_circle_right_outlined))),
+                       Obx(() => Visibility(
+                            visible: !_controller.addNewTaskInProgress,
+                              replacement: const CenterCircularProgressIndicator(),
+                              child: ElevatedButton(onPressed: ()=>_addButton(context), child: const Icon(Icons.arrow_circle_right_outlined)))),
+
+
                     ],
                   ),
                 ),
@@ -114,38 +108,29 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     );
   }
 
-  void _addButton() {
+  void _addButton(BuildContext context) {
 
     if(!_addNewFormKey.currentState!.validate()){
       return;
     }
-    _addNewTask();
+    _addNewTask(context);
 
   }
 
 
 
 
-  Future<void> _addNewTask()async{
-    _addNewTaskInProgress = true;
-    setState(() {});
-    Map<String, dynamic> requestBody = {
-      "title":_titleTEController.text.trim(),
-      "description": _descriptionTEController.text.trim(),
-      "status":"New"
-    };
-    final NetworkResponse response = await NetworkCaller.postRequest(url: Urls.createTask,body: requestBody);
-    _addNewTaskInProgress = false;
-    setState(() {});
+  Future<void> _addNewTask(BuildContext context)async{
+    final result = await _controller.addNewTask(title: _titleTEController.text.trim(),description: _descriptionTEController.text.trim(),status: "New");
 
-    if(response.isSuccess){
-      _shouldRefreshPreviousPage = true;
+    if(result){
+
       _clearTextFields();
       showSnackBarMessage(context, "New task added");
 
     }
     else{
-      showSnackBarMessage(context, response.errorMessage,true);
+      showSnackBarMessage(context, _controller.errorMessage,true);
 
     }
 

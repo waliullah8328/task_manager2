@@ -1,81 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_manager/data/model/network_response.dart';
-import 'package:task_manager/data/model/task_list_model.dart';
-import 'package:task_manager/data/model/task_model.dart';
-import 'package:task_manager/data/model/task_status_count_model.dart';
 import 'package:task_manager/data/model/task_status_model.dart';
-import 'package:task_manager/data/service/network_caller.dart';
-import 'package:task_manager/data/utils/urls.dart';
-import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/snack_bar_message.dart';
+import 'package:task_manager/ui/controllers/new_task_list_controller.dart';
 
 import '../widgets/list_of_task.dart';
 import '../widgets/task_summary_card.dart';
 import 'add_new_task_screen.dart';
 
-class NewTaskScreen extends StatefulWidget {
-  const NewTaskScreen({super.key});
+class NewTaskScreen extends StatelessWidget {
+  NewTaskScreen({super.key});
 
-  @override
-  State<NewTaskScreen> createState() => _NewTaskScreenState();
-}
-
-class _NewTaskScreenState extends State<NewTaskScreen> {
-  List taskItems = [];
-  List<TaskModel> _newTaskList = [];
-  List<TaskStatusModel> taskStatusCountList = [];
-  bool _getNewTaskInProgress = false;
-  bool _getTaskStatusCountInProgress = false;
-  String status = "New";
-
-  @override
-  void initState() {
-    super.initState();
-    _getNewTaskList();
-    _getTaskStatusCount();
-  }
+  final NewTaskListController _controller = Get.find<NewTaskListController>();
+  final String status = "New";
 
   @override
   Widget build(BuildContext context) {
+    _controller.getNewTaskList();
+    _controller.getTaskStatusCount();
+
     return Scaffold(
       body: Column(
         children: [
-          _buildSummarySection(taskStatusCountList), // Task summary section
-          Visibility(
-            visible: !_getNewTaskInProgress,
-            replacement: const CenterCircularProgressIndicator(),
-            child: Expanded(
-              child: ListView.separated(
-                itemCount: _newTaskList.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  return ListOfTask(
-                    taskModel: _newTaskList[index],
-                    onRefresh: () {
-                      _getNewTaskList();
+          GetBuilder<NewTaskListController>(
+            builder: (controller) {
+              return _buildSummarySection(controller.taskStatusCountList);
+            },
+          ), // Task summary section
+          Expanded(
+            child: GetBuilder<NewTaskListController>(
+              builder: (controller) {
+                return Visibility(
+                  visible: !controller.inProgress,
+                  replacement: const Center(child: CircularProgressIndicator()),
+                  child: ListView.separated(
+                    itemCount: controller.taskList.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      return ListOfTask(
+                        taskModel: controller.taskList[index],
+                        onRefresh: () {
+                          _controller.getNewTaskList();
+                          _controller.getTaskStatusCount();
+                        },
+                      );
                     },
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _onTapAddButton, // Handle add new task button
+        onPressed: () => _onTapAddButton(context), // Handle add new task button
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // Updated the _buildSummarySection function
-// Build the summary section dynamically based on taskStatusCountList
   Widget _buildSummarySection(List<TaskStatusModel> taskStatusCountList) {
-    // Define the desired order for the task statuses
     final List<String> order = ["New", "Completed", "Progress", "Canceled"];
 
-    // Sort the taskStatusCountList according to the predefined order
     List<TaskStatusModel> sortedTaskStatusCountList = taskStatusCountList
         .where((task) => order.contains(task.sId)) // Filter only relevant tasks
         .toList()
@@ -97,25 +82,21 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
   }
 
-
-
-
-  // Function to handle adding new tasks
-  Future<void> _onTapAddButton() async {
+  Future<void> _onTapAddButton(BuildContext context) async {
     final bool? shouldRefresh = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddNewTaskScreen(),
+        builder: (context) =>  AddNewTaskScreen(),
       ),
     );
 
     if (shouldRefresh == true) {
-      _getNewTaskList();
+      _controller.getNewTaskList();
+      _controller.getTaskStatusCount(); // Refresh task status count as well
     }
   }
 
-  // Handle task deletion with confirmation dialog
-  deleteId(id) {
+  void deleteId(BuildContext context, String id) {
     showDialog(
       context: context,
       builder: (context) {
@@ -126,11 +107,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             OutlinedButton(
               onPressed: () async {
                 Navigator.pop(context); // Close dialog
-                setState(() {
-                  // isLoading = true; // Set loading state
-                });
-                // await taskDeleteRequest(id); // Delete the task
-                // await callData(); // Refresh the data
+                // Add your delete functionality here
               },
               child: const Text("Yes"),
             ),
@@ -146,11 +123,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
   }
 
-  // Handle status change with modal bottom sheet
-  statusChangeId(id) {
+  void statusChangeId(BuildContext context, String id) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
+        String localStatus = status; // Define a local status variable
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
@@ -161,41 +139,41 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   // Radio buttons for status selection
                   RadioListTile(
                     value: "New",
-                    groupValue: status,
+                    groupValue: localStatus,
                     title: const Text("New"),
                     onChanged: (value) {
                       setModalState(() {
-                        status = value.toString(); // Update local status
+                        localStatus = value.toString();
                       });
                     },
                   ),
                   RadioListTile(
                     value: "Progress",
-                    groupValue: status,
+                    groupValue: localStatus,
                     title: const Text("Progress"),
                     onChanged: (value) {
                       setModalState(() {
-                        status = value.toString();
+                        localStatus = value.toString();
                       });
                     },
                   ),
                   RadioListTile(
                     value: "Completed",
-                    groupValue: status,
+                    groupValue: localStatus,
                     title: const Text("Completed"),
                     onChanged: (value) {
                       setModalState(() {
-                        status = value.toString();
+                        localStatus = value.toString();
                       });
                     },
                   ),
                   RadioListTile(
                     value: "Canceled",
-                    groupValue: status,
+                    groupValue: localStatus,
                     title: const Text("Canceled"),
                     onChanged: (value) {
                       setModalState(() {
-                        status = value.toString();
+                        localStatus = value.toString();
                       });
                     },
                   ),
@@ -207,14 +185,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(context); // Close modal
-                        setState(() {
-                          // isLoading = true; // Set loading state
-                        });
-                        // await taskUpdateRequest(id, status); // Update task status
-                        // await callData(); // Refresh the data
-                        setState(() {
-                          status = "New"; // Reset status
-                        });
+                        _controller.getTaskStatusCount(); // Refresh the task status count
+                        // Add your status update functionality here
                       },
                       child: const Text("Confirm"),
                     ),
@@ -226,35 +198,5 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         );
       },
     );
-  }
-
-  Future<void> _getNewTaskList() async {
-    _newTaskList.clear();
-    _getNewTaskInProgress = true;
-    setState(() {});
-    final NetworkResponse response = await NetworkCaller.getRequest(url: Urls.newTaskList);
-    _getNewTaskInProgress = false;
-    setState(() {});
-    if (response.isSuccess) {
-      final TaskListModel taskListModel = TaskListModel.fromJson(response.responseData);
-      _newTaskList = taskListModel.taskList ?? [];
-    } else {
-      showSnackBarMessage(context, response.errorMessage, true);
-    }
-  }
-
-  Future<void> _getTaskStatusCount() async {
-    taskStatusCountList.clear();
-    _getTaskStatusCountInProgress = true;
-    setState(() {});
-    final NetworkResponse response = await NetworkCaller.getRequest(url: Urls.taskStatusCount);
-    _getTaskStatusCountInProgress = false;
-    setState(() {});
-    if (response.isSuccess) {
-      final TaskStatusCountModel taskStatusCountModel = TaskStatusCountModel.fromJson(response.responseData);
-      taskStatusCountList = taskStatusCountModel.taskStatusCountList ?? [];
-    } else {
-      showSnackBarMessage(context, response.errorMessage, true);
-    }
   }
 }

@@ -39,7 +39,7 @@ class SplashScreen extends StatefulWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MainBottomNavBarScreen(),
+            builder: (context) =>  MainBottomNavBarScreen(),
           ),
         );
 

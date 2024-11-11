@@ -5,9 +5,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager/ui/controllers/forgot_password_otp_controller.dart';
 import 'package:task_manager/ui/screens/reset_password_screen.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
-
 import '../utils/app_colors.dart';
-
 import '../widgets/screen_background.dart';
 
 

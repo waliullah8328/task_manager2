@@ -12,12 +12,12 @@ import 'forgot_password_email_screen.dart';
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
 
-  // Private form key and controllers
+  // Private form key
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
 
-  // Private instance of SignInController
+  // Using GetX to handle TextEditingControllers via a Binding setup
   final SignInController _controller = Get.find<SignInController>();
 
   @override
@@ -60,7 +60,6 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // Private widget for sign-in form
   Widget _buildSignInForm(BuildContext context) {
     return Form(
       key: _loginFormKey,
@@ -108,7 +107,6 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // Private widget for sign-up section
   Widget _buildSignUpSection(BuildContext context) {
     return RichText(
       text: TextSpan(
@@ -130,7 +128,6 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // Private methods for button taps
   void _onTapNextButton(BuildContext context) {
     if (!_loginFormKey.currentState!.validate()) return;
     _signIn(context);
@@ -150,17 +147,16 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  // Private method for handling sign-in logic
   Future<void> _signIn(BuildContext context) async {
     final bool result = await _controller.signIn(
       _emailTEController.text.trim(),
       _passwordTEController.text,
     );
+      if (result) {
+        Get.off(MainBottomNavBarScreen());
+      } else {
+        showSnackBarMessage(context, _controller.errorMessage, true);
+      }
 
-    if (result) {
-      Get.off(MainBottomNavBarScreen());
-    } else {
-      showSnackBarMessage(context, _controller.errorMessage, true);
-    }
   }
 }

@@ -21,6 +21,7 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
   @override
   Widget build(BuildContext context) {
     return  GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: TaskManagerApp.navigatorKey,
       theme: ThemeData(
         colorSchemeSeed: AppColors.themeColor,
@@ -34,7 +35,7 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
       initialRoute: "/",
       routes: {
         SplashScreen.name:(context)=> const SplashScreen(),
-        MainBottomNavBarScreen.name:(context)=> const MainBottomNavBarScreen(),
+        MainBottomNavBarScreen.name:(context)=>  MainBottomNavBarScreen(),
       },
     );
   }

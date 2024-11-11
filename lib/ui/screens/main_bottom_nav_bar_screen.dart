@@ -1,45 +1,24 @@
 
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/ui/screens/progress_task_screen.dart';
-
-
+import '../controllers/bottom_navbar_controller.dart';
 import '../widgets/task_manager_app_bar.dart';
 import 'canceled_task_screen.dart';
 import 'completed_task_screen.dart';
 import 'new_task_screen.dart';
 
-class MainBottomNavBarScreen extends StatefulWidget {
+class MainBottomNavBarScreen extends StatelessWidget {
 
   static const String name = "/home";
-  const MainBottomNavBarScreen({super.key});
+ MainBottomNavBarScreen({super.key});
 
-  @override
-  State<MainBottomNavBarScreen> createState() => _MainBottomNavBarScreenState();
-}
 
-class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
-  int _selectedIndex = 0; // Move it here, so it's part of the widget's state
 
-  Map<String,String> profileData= {"email":"","firstName":"","lastName":"",};
+ final controller = Get.find<BottomNavBarController>();
 
-  readAppBarData() async {
-   // String? email = await readUserData("email");
-   // String? firstName = await readUserData("firstName");
-    //String? lastName = await readUserData("lastName");
-    setState(() {
-     // profileData= {"email":"$email","firstName":"$firstName","lastName":"$lastName",};
-
-    });
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    readAppBarData();
-    super.initState();
-  }
-
-  static const List<Widget> _screens = [
+  static  List<Widget> _screens = [
     NewTaskScreen(),
     CompletedTaskScreen(),
     CanceledTaskScreen(),
@@ -49,14 +28,14 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TaskManagerAppBar( profileData: profileData,),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
+      appBar: TaskManagerAppBar( ),
+      body: Obx(() => _screens[controller.selectedIndex]),
+      bottomNavigationBar:Obx(() => NavigationBar(
+        selectedIndex: controller.selectedIndex,
         onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index; // Update selected index
-          });
+
+            controller.selectedIndex = index; // Update selected index
+
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.new_label), label: "New"),
@@ -64,7 +43,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
           NavigationDestination(icon: Icon(Icons.close), label: "Cancel"),
           NavigationDestination(icon: Icon(Icons.access_time_filled_outlined), label: "Progress"),
         ],
-      ),
+      )),
     );
   }
 }
