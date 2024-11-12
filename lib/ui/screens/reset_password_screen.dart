@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controllers/reset_password_controller.dart';
-import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
+import '../../data/routes/route_name.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -137,7 +137,8 @@ class ResetPasswordScreen extends StatelessWidget {
   }
   void _onTapSignIn(BuildContext context) {
     // TODO: implement on tap signup screen
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
+    //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
+    Get.offAll(RouteName.loginScreen);
   }
 
   void _onTapNextButton(BuildContext context){
@@ -162,7 +163,8 @@ class ResetPasswordScreen extends StatelessWidget {
   Future<void> _resetPassword(BuildContext context)async{
     final bool result = await controller.resetPassword(password: _passwordTEController.text);
     if(result){
-      Get.offAll(()=> SignInScreen());
+      //Get.offAll(()=> SignInScreen());
+      Get.offAllNamed(RouteName.loginScreen);
       Get.showSnackbar(
         const GetSnackBar(
           title: "Success",

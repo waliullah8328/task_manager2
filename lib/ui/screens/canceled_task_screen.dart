@@ -8,16 +8,7 @@ import '../widgets/list_of_task.dart';
 
 class CanceledTaskScreen extends StatelessWidget {
    CanceledTaskScreen({super.key});
-
-
   final _controller = Get.find<CancelTaskController>();
-
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     _controller.getCanceledTaskList();

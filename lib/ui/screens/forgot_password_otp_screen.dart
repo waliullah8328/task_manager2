@@ -2,9 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/data/routes/route_name.dart';
 import 'package:task_manager/ui/controllers/forgot_password_otp_controller.dart';
-import 'package:task_manager/ui/screens/reset_password_screen.dart';
-import 'package:task_manager/ui/screens/sign_in_screen.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -125,7 +124,8 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
   Future<void> _forgotEmailAndOtp()async{
     final bool result = await controller.forgotEmailAndOtp(otp: _pinVerificationTEController.text);
     if(result){
-      Get.to(()=>ResetPasswordScreen());
+      //Get.to(()=>ResetPasswordScreen());
+      Get.toNamed(RouteName.resetPasswordScreen);
       Get.showSnackbar(
         const GetSnackBar(
           title: "Success",
@@ -154,7 +154,8 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
   void _onTapSignIn(BuildContext context) {
     // TODO: implement on tap signup screen
 
-    Get.off(()=>SignInScreen());
+    //Get.off(()=>SignInScreen());
+    Get.offNamed(RouteName.loginScreen);
     //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) =>  SignInScreen(),), (route) => false);
   }
 }

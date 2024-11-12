@@ -7,7 +7,7 @@ import '../utils/app_colors.dart';
 
 class ListOfTask extends StatelessWidget {
   final TaskModel taskModel;
-  final VoidCallback onRefresh;
+  final  void Function() onRefresh;
 
   const ListOfTask({
     super.key,
@@ -18,8 +18,8 @@ class ListOfTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TaskEditDeleteController controller = Get.put(
-      TaskEditDeleteController(taskModel.obs),
-      tag: taskModel.sId, // Use a unique tag for each task instance
+      TaskEditDeleteController(taskModel.obs,onRefresh),
+      tag: taskModel.sId,
     );
 
     return Obx(() {
@@ -94,6 +94,7 @@ class ListOfTask extends StatelessWidget {
               return ListTile(
                 onTap: () {
                   controller.changeStatus(e);
+                  onRefresh();
 
                   Navigator.pop(context);
                 },

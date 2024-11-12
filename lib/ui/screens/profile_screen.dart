@@ -71,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextFormField(
                   enabled: false,
                   controller: _emailTEController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Email",
                   ),
                   validator: (String? value){
@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 8,),
                 TextFormField(
                   controller: _firstNameTEController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "First Name",
                   ),
                   validator: (String? value){
@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 8,),
                 TextFormField(
                   controller: _lastNameTEController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Last Name",
                   ),
                   validator: (String? value){
@@ -110,9 +110,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 8,),
                 TextFormField(
                   controller: _phoneTEController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Phone Number",
-            
+
                   ),
                   validator: (String? value){
                     if(value?.trim().isEmpty?? true){
@@ -124,9 +124,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 8,),
                 TextFormField(
                   controller: _passwordTEController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Password",
-            
+
                   ),
 
                 ),
@@ -143,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }, child: Icon(Icons.arrow_circle_right_outlined)),
                 ),
                 const SizedBox(height: 16,),
-            
+
               ],
             ),
           ),

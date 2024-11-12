@@ -11,14 +11,13 @@ import 'new_task_screen.dart';
 
 class MainBottomNavBarScreen extends StatelessWidget {
 
-  static const String name = "/home";
  MainBottomNavBarScreen({super.key});
 
 
 
  final controller = Get.find<BottomNavBarController>();
 
-  static  List<Widget> _screens = [
+  static  final List<Widget> _screens = [
     NewTaskScreen(),
     CompletedTaskScreen(),
     CanceledTaskScreen(),

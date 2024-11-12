@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/data/model/task_status_model.dart';
+import 'package:task_manager/data/routes/route_name.dart';
 import 'package:task_manager/ui/controllers/new_task_list_controller.dart';
-
 import '../widgets/list_of_task.dart';
 import '../widgets/task_summary_card.dart';
-import 'add_new_task_screen.dart';
+
 
 class NewTaskScreen extends StatelessWidget {
   NewTaskScreen({super.key});
@@ -83,12 +83,15 @@ class NewTaskScreen extends StatelessWidget {
   }
 
   Future<void> _onTapAddButton(BuildContext context) async {
+    /*
     final bool? shouldRefresh = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>  AddNewTaskScreen(),
       ),
-    );
+    );*/
+
+    final bool shouldRefresh = await Get.toNamed(RouteName.addNewTaskScreen);
 
     if (shouldRefresh == true) {
       _controller.getNewTaskList();

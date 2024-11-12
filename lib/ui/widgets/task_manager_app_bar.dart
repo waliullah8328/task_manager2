@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:get/get.dart';
+import 'package:task_manager/data/routes/route_name.dart';
 import '../controllers/auth_controller.dart';
-import '../screens/profile_screen.dart';
-import '../screens/sign_in_screen.dart';
 import '../utils/app_colors.dart';
 
 
 class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
-  TaskManagerAppBar({
-    Key? key,
+  const TaskManagerAppBar({
+    super.key,
     this.isProfileOpen = false,
     this.profileData,
-  }) : super(key: key);
+  });
 
   final bool isProfileOpen;
   final Map<String, String>? profileData;
@@ -24,18 +22,19 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (isProfileOpen) {
           return;
         }
-        Navigator.push(
+        /*Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const ProfileScreen(),
+            builder: (context) =>  ProfileScreen(),
           ),
-        );
+        );*/
+        Get.toNamed(RouteName.profileScreen);
       },
       child: AppBar(
         backgroundColor: AppColors.themeColor,
         title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
               backgroundColor: Colors.white,
               child:  Icon(Icons.person, size: 16), // Example placeholder icon
@@ -54,7 +53,7 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   Text(
-                   "${AuthController.userData!.email}" ?? "No email available",
+                   "${AuthController.userData!.email}",
                     style: const TextStyle(fontSize: 12, color: Colors.white),
                   ),
                 ],
@@ -63,11 +62,14 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
             IconButton(
               onPressed: () async {
                 await AuthController.clearUserData();
+                /*
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) =>  SignInScreen()),
                       (route) => false,
                 );
+                */
+                Get.offAllNamed(RouteName.loginScreen);
               },
               icon: const Icon(Icons.logout),
             ),

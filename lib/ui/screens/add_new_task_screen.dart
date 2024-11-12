@@ -2,22 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/ui/controllers/add_new_task_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import '../widgets/task_manager_app_bar.dart';
 
 
 class AddNewTaskScreen extends StatelessWidget {
    AddNewTaskScreen({super.key});
 
-
-
-
-
-
   final TextEditingController _titleTEController = TextEditingController();
   final TextEditingController _descriptionTEController = TextEditingController();
-
-
   final GlobalKey<FormState> _addNewFormKey = GlobalKey<FormState>();
   final _controller = Get.find<AddNewTaskController>();
 
@@ -57,7 +49,7 @@ class AddNewTaskScreen extends StatelessWidget {
                     children: [
                       TextFormField(
                         controller: _titleTEController,
-                        //autovalidateMode: AutovalidateMode.onUserInteraction,
+
                         validator: (String? value){
                           if(value?.trim().isEmpty ?? true){
                             return "Title is required";
@@ -75,7 +67,7 @@ class AddNewTaskScreen extends StatelessWidget {
                       TextFormField(
                         controller: _descriptionTEController,
                         maxLines: 5,
-                        //autovalidateMode: AutovalidateMode.onUserInteraction,
+
                         validator: (String? value){
                           if(value?.isEmpty ?? true){
                             return "Description is required";
@@ -86,7 +78,7 @@ class AddNewTaskScreen extends StatelessWidget {
       
                         keyboardType: TextInputType.text,
                         decoration: const InputDecoration(
-                            hintText: "Decription"
+                            hintText: "Description"
                         ),
                       ),
                       const SizedBox(height: 16,),
@@ -126,11 +118,14 @@ class AddNewTaskScreen extends StatelessWidget {
     if(result){
 
       _clearTextFields();
-      showSnackBarMessage(context, "New task added");
+
+      //showSnackBarMessage(context, "New task added");
+      Get.showSnackbar(const GetSnackBar(title: "Success",message: "New task added",duration: Duration(seconds: 3),));
 
     }
     else{
-      showSnackBarMessage(context, _controller.errorMessage,true);
+      //showSnackBarMessage(context, _controller.errorMessage,true);
+      Get.showSnackbar(GetSnackBar(title: "Error",message: _controller.errorMessage,duration: const Duration(seconds: 3),));
 
     }
 

@@ -1,13 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:task_manager/ui/controllers/forgot_email_controller.dart';
-import 'package:task_manager/ui/screens/forgot_password_otp_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
+import '../../data/routes/route_name.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
-import '../widgets/snack_bar_message.dart';
+
 
 class ForgotPasswordEmailScreen extends StatelessWidget {
   ForgotPasswordEmailScreen({super.key});
@@ -119,10 +118,15 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
     final bool result = await controller.forgotEmail(email:_emailTEController.text.trim());
 
     if (result) {
-      Get.to(() =>  ForgotPasswordOtpScreen());
-      showSnackBarMessage(context, "Successfully Submitted");
+      //Get.to(() =>  ForgotPasswordOtpScreen());
+      Get.toNamed(RouteName.forgotPasswordOtpScreen);
+      //showSnackBarMessage(context, "Successfully Submitted");
+      Get.showSnackbar(const GetSnackBar(title: "Success",message: "Successfully Submitted",duration: Duration(seconds: 3),));
     } else {
-      showSnackBarMessage(context, controller.errorMessage ?? "Error", true);
+      //showSnackBarMessage(context, controller.errorMessage ?? "Error", true);
+      Get.showSnackbar( GetSnackBar(title: "Error",message: controller.errorMessage,duration: const Duration(seconds: 3),));
     }
   }
 }
+
+

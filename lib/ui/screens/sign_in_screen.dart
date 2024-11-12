@@ -1,13 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:task_manager/data/routes/route_name.dart';
 import 'package:task_manager/ui/controllers/sign_in_controller.dart';
-import 'package:task_manager/ui/screens/main_bottom_nav_bar_screen.dart';
-import 'package:task_manager/ui/screens/signup_screen.dart';
-import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
-import 'forgot_password_email_screen.dart';
+
 
 class SignInScreen extends StatelessWidget {
   SignInScreen({super.key});
@@ -134,17 +132,23 @@ class SignInScreen extends StatelessWidget {
   }
 
   void _onTapForgotPasswordButton(BuildContext context) {
+    /*
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ForgotPasswordEmailScreen()),
-    );
+    );*/
+    Get.toNamed(RouteName.forgotPasswordEmailScreen);
   }
 
   void _onTapSignUp(BuildContext context) {
+
+    Get.toNamed(RouteName.signUpScreen);
+
+    /*
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SignUpScreen()),
-    );
+    );*/
   }
 
   Future<void> _signIn(BuildContext context) async {
@@ -153,9 +157,11 @@ class SignInScreen extends StatelessWidget {
       _passwordTEController.text,
     );
       if (result) {
-        Get.off(MainBottomNavBarScreen());
+        Get.offAllNamed(RouteName.mainBottomScreen);
       } else {
-        showSnackBarMessage(context, _controller.errorMessage, true);
+
+        //showSnackBarMessage(context, _controller.errorMessage, true);
+        Get.showSnackbar(GetSnackBar(title:"Error",message: _controller.errorMessage,duration: const Duration(seconds: 3),));
       }
 
   }

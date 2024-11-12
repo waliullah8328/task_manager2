@@ -10,9 +10,6 @@ class ProgressTaskScreen extends StatelessWidget {
 
   final _controller = Get.find<ProgressTaskController>();
 
-
-
-
   @override
   Widget build(BuildContext context) {
     _controller.getProgressTaskList();

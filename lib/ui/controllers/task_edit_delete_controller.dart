@@ -8,11 +8,12 @@ class TaskEditDeleteController extends GetxController {
   final _changeStatusInProgress = false.obs;
   final _deleteTaskInProgress = false.obs;
   final Rx<TaskModel> taskModel;
+  void Function()? onRefresh;
 
   bool get changeStatusInProgress => _changeStatusInProgress.value;
   bool get deleteTaskInProgress => _deleteTaskInProgress.value;
 
-  TaskEditDeleteController(this.taskModel);
+  TaskEditDeleteController(this.taskModel,this.onRefresh);
 
   Future<void> changeStatus(String newStatus) async {
     _changeStatusInProgress.value = true;
@@ -21,7 +22,8 @@ class TaskEditDeleteController extends GetxController {
     );
     if (response.isSuccess) {
       taskModel.value.status = newStatus;
-      taskModel.refresh(); // Refresh the task model for UI updates
+      taskModel.refresh();
+      onRefresh?.call();
       Get.snackbar('Status Update', 'Task status updated successfully.');
     } else {
       Get.snackbar('Error', response.errorMessage);
@@ -35,7 +37,8 @@ class TaskEditDeleteController extends GetxController {
       url: Urls.deleteTask(taskModel.value.sId!),
     );
     if (response.isSuccess) {
-      Get.back(); // Optionally, close the page or perform another action on success
+      Get.back();
+      onRefresh?.call();
       Get.snackbar('Delete', 'Task deleted successfully.');
     } else {
       Get.snackbar('Error', response.errorMessage);

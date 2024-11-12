@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:task_manager/bindings/controller_binder.dart';
+import 'package:task_manager/data/routes/route_name.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_bar_screen.dart';
 import 'package:task_manager/ui/screens/splash_screen.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
+
+import 'data/routes/route.dart';
 
 
 
@@ -32,11 +35,8 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
         elevatedButtonTheme: _elevatedButtonThemeData()
       ),
       initialBinding: ControllerBinders(),
-      initialRoute: "/",
-      routes: {
-        SplashScreen.name:(context)=> const SplashScreen(),
-        MainBottomNavBarScreen.name:(context)=>  MainBottomNavBarScreen(),
-      },
+      initialRoute: RouteName.splashScreen,
+      onGenerateRoute: Routes.generateRoute,
     );
   }
 
