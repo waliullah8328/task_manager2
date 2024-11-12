@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../../data/model/login_model.dart';
 import '../../data/model/network_response.dart';
@@ -5,7 +6,7 @@ import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
 import 'auth_controller.dart';
 
-class SignInController extends GetxController {
+class SignInProvider with ChangeNotifier {
   // Private reactive properties
   final RxBool _inProgress = false.obs;
   final RxBool _isSuccess = false.obs;
@@ -19,6 +20,8 @@ class SignInController extends GetxController {
   // Private method for sign-in process
   Future<bool> signIn(String email, String password) async {
     _inProgress.value = true;
+    notifyListeners();
+
     Map<String, dynamic> requestBody = {"email": email, "password": password};
     final NetworkResponse response =
     await NetworkCaller.postRequest(url: Urls.login, body: requestBody);
@@ -33,6 +36,7 @@ class SignInController extends GetxController {
       _isSuccess.value = false;
     }
     _inProgress.value = false;
+    notifyListeners();
     return _isSuccess.value;
   }
 }

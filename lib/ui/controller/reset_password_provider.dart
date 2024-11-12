@@ -1,11 +1,12 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../../data/model/network_response.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
 import '../utils/utils.dart';
 
-class ResetPasswordController extends GetxController{
+class ResetPasswordProvider with ChangeNotifier{
 
   final RxBool _inProgress = false.obs;
   final RxBool _isSuccess = false.obs;
@@ -17,6 +18,7 @@ class ResetPasswordController extends GetxController{
 
   Future<bool> resetPassword({password})async{
     _inProgress.value = true;
+    notifyListeners();
     final String? email = await readUserData("EmailVerification");
     final String? otp = await readUserData("OTPVerification");
     Map<String, dynamic> requestBody = {
@@ -37,6 +39,7 @@ class ResetPasswordController extends GetxController{
       _errorMessage.value = response.errorMessage;
     }
     _inProgress.value = false;
+    notifyListeners();
 
     return _isSuccess.value;
 

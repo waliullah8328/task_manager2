@@ -5,7 +5,7 @@ import '../../data/model/network_response.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
 
-class SignUpController extends GetxController{
+class SignUpProvider with ChangeNotifier{
 
   // Text Editing Variables
   final TextEditingController _emailTEController = TextEditingController();
@@ -53,7 +53,7 @@ class SignUpController extends GetxController{
 
   Future<bool> signUp() async {
     _inProgress = true;
-    update();
+    notifyListeners();
     Map<String, dynamic> requestBody = {
       "email": _emailTEController.text.trim(),
       "firstName": _firstNameTEController.text,
@@ -72,7 +72,7 @@ class SignUpController extends GetxController{
       _errorMessage = response.errorMessage;
     }
     _inProgress = false;
-    update();
+    notifyListeners();
 
     return isSuccess;
   }

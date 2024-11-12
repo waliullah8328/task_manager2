@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import 'package:task_manager/data/model/task_status_count_model.dart';
@@ -10,7 +11,12 @@ import '../../data/model/task_status_model.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
 
-class NewTaskListController extends GetxController{
+class NewTaskListProvider with ChangeNotifier{
+
+  NewTaskListProvider(){
+    getNewTaskList();
+    getTaskStatusCount();
+  }
 
 
   final RxBool _inProgress = false.obs;
@@ -45,7 +51,7 @@ class NewTaskListController extends GetxController{
 
     _taskList.clear();
     _inProgress.value = true;
-    update();
+    notifyListeners();
     final NetworkResponse response = await NetworkCaller.getRequest(url: Urls.newTaskList);
 
     if (response.isSuccess) {
@@ -57,7 +63,7 @@ class NewTaskListController extends GetxController{
      _isSuccess.value = false;
     }
     _inProgress.value= false;
-    update();
+    notifyListeners();
     return _isSuccess.value;
 
   }
@@ -65,10 +71,10 @@ class NewTaskListController extends GetxController{
   Future<bool> getTaskStatusCount()async{
     taskStatusCountList.clear();
     _getTaskStatusCountInProgress.value = true;
-    update();
+    notifyListeners();
     final NetworkResponse response = await NetworkCaller.getRequest(url: Urls.taskStatusCount);
     _getTaskStatusCountInProgress.value = false;
-    update();
+    notifyListeners();
     if (response.isSuccess) {
       final TaskStatusCountModel taskStatusCountModel = TaskStatusCountModel.fromJson(response.responseData);
       _taskStatusCountList = taskStatusCountModel.taskStatusCountList ?? [];

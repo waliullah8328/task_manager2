@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_manager/ui/controllers/reset_password_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import '../../data/routes/route_name.dart';
+import '../controller/reset_password_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -17,12 +18,13 @@ class ResetPasswordScreen extends StatelessWidget {
   final _resetPasswordFormKey = GlobalKey<FormState>();
    final TextEditingController _passwordTEController = TextEditingController();
    final TextEditingController _confirmPasswordTEController = TextEditingController();
-  final controller = Get.find<ResetPasswordController>();
+
 
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    final controller = Provider.of<ResetPasswordProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: ScreenBackground(
@@ -39,7 +41,7 @@ class ResetPasswordScreen extends StatelessWidget {
                   const SizedBox(
                     height: 24,
                   ),
-                  _buildResetPasswordForm(context),
+                  _buildResetPasswordForm(context,controller),
                   const SizedBox(
                     height: 48,
                   ),
@@ -56,7 +58,7 @@ class ResetPasswordScreen extends StatelessWidget {
   }
 
 
-  Widget _buildResetPasswordForm(BuildContext context) {
+  Widget _buildResetPasswordForm(BuildContext context,controller) {
     return Form(
       key: _resetPasswordFormKey,
       child: Column(
@@ -108,13 +110,15 @@ class ResetPasswordScreen extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-          Obx(() => Visibility(
-            visible: !controller.inProgress,
-            replacement: const CenterCircularProgressIndicator(),
-            child: ElevatedButton(
-                onPressed:()=>_onTapNextButton(context),
-                child: const Icon(Icons.arrow_circle_right_outlined)),
-          )),
+          Consumer<ResetPasswordProvider>(builder: (context, value, child) {
+            return Visibility(
+              visible: !value.inProgress,
+              replacement: const CenterCircularProgressIndicator(),
+              child: ElevatedButton(
+                  onPressed:()=>_onTapNextButton(context,controller),
+                  child: const Icon(Icons.arrow_circle_right_outlined)),
+            );
+          },),
         ],
       ),
     );
@@ -141,12 +145,12 @@ class ResetPasswordScreen extends StatelessWidget {
     Get.offAll(RouteName.loginScreen);
   }
 
-  void _onTapNextButton(BuildContext context){
+  void _onTapNextButton(BuildContext context,controller){
     if(!_resetPasswordFormKey.currentState!.validate()){
       return;
     }
     if(_passwordTEController.text == _confirmPasswordTEController.text){
-      _resetPassword(context);
+      _resetPassword(context,controller);
 
 
 
@@ -160,7 +164,7 @@ class ResetPasswordScreen extends StatelessWidget {
 
   }
 
-  Future<void> _resetPassword(BuildContext context)async{
+  Future<void> _resetPassword(BuildContext context,controller)async{
     final bool result = await controller.resetPassword(password: _passwordTEController.text);
     if(result){
       //Get.offAll(()=> SignInScreen());

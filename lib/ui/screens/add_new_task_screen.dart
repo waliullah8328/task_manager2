@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_manager/ui/controllers/add_new_task_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager/ui/controller/add_new_task_provider.dart';
+
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
+
 import '../widgets/task_manager_app_bar.dart';
 
 
@@ -11,7 +14,6 @@ class AddNewTaskScreen extends StatelessWidget {
   final TextEditingController _titleTEController = TextEditingController();
   final TextEditingController _descriptionTEController = TextEditingController();
   final GlobalKey<FormState> _addNewFormKey = GlobalKey<FormState>();
-  final _controller = Get.find<AddNewTaskController>();
 
 
 
@@ -20,6 +22,7 @@ class AddNewTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<AddNewTaskProvider>(context);
 
     return PopScope(
       canPop: false,
@@ -27,11 +30,11 @@ class AddNewTaskScreen extends StatelessWidget {
        if(result){
          return;
        }
-        Navigator.pop(context,_controller.shouldRefreshPreviousPage);
+        Navigator.pop(context,controller.shouldRefreshPreviousPage);
 
       },
       child: Scaffold(
-        appBar: TaskManagerAppBar(),
+        appBar: const TaskManagerAppBar(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -82,10 +85,12 @@ class AddNewTaskScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16,),
-                       Obx(() => Visibility(
-                            visible: !_controller.addNewTaskInProgress,
-                              replacement: const CenterCircularProgressIndicator(),
-                              child: ElevatedButton(onPressed: ()=>_addButton(context), child: const Icon(Icons.arrow_circle_right_outlined)))),
+                       Consumer<AddNewTaskProvider>(builder: (context, value, child) {
+                         return Visibility(
+                             visible: !value.addNewTaskInProgress,
+                             replacement: const CenterCircularProgressIndicator(),
+                             child: ElevatedButton(onPressed: ()=>_addButton(context,value), child: const Icon(Icons.arrow_circle_right_outlined)));
+                       },),
 
 
                     ],
@@ -100,20 +105,20 @@ class AddNewTaskScreen extends StatelessWidget {
     );
   }
 
-  void _addButton(BuildContext context) {
+  void _addButton(BuildContext context,controller) {
 
     if(!_addNewFormKey.currentState!.validate()){
       return;
     }
-    _addNewTask(context);
+    _addNewTask(context,controller);
 
   }
 
 
 
 
-  Future<void> _addNewTask(BuildContext context)async{
-    final result = await _controller.addNewTask(title: _titleTEController.text.trim(),description: _descriptionTEController.text.trim(),status: "New");
+  Future<void> _addNewTask(BuildContext context,controller)async{
+    final result = await controller.addNewTask(title: _titleTEController.text.trim(),description: _descriptionTEController.text.trim(),status: "New");
 
     if(result){
 
@@ -125,7 +130,7 @@ class AddNewTaskScreen extends StatelessWidget {
     }
     else{
       //showSnackBarMessage(context, _controller.errorMessage,true);
-      Get.showSnackbar(GetSnackBar(title: "Error",message: _controller.errorMessage,duration: const Duration(seconds: 3),));
+      Get.showSnackbar(GetSnackBar(title: "Error",message: controller.errorMessage,duration: const Duration(seconds: 3),));
 
     }
 

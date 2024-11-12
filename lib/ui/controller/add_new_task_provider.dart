@@ -1,18 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 
 import '../../data/model/network_response.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
-import '../widgets/snack_bar_message.dart';
 
-class AddNewTaskController extends GetxController{
+
+class AddNewTaskProvider with ChangeNotifier{
 
 
   final RxBool _addNewTaskInProgress = false.obs;
   final RxBool _shouldRefreshPreviousPage = false.obs;
   final RxBool _isSuccess = false.obs;
-  RxString _errorMessage = "".obs;
+  final RxString _errorMessage = "".obs;
 
 
   bool get addNewTaskInProgress => _addNewTaskInProgress.value;
@@ -24,7 +25,7 @@ class AddNewTaskController extends GetxController{
 
   Future<bool> addNewTask({title,description,status})async{
     _addNewTaskInProgress.value = true;
-    update();
+    notifyListeners();
     Map<String, dynamic> requestBody = {
       "title":title,
       "description": description,
@@ -46,7 +47,7 @@ class AddNewTaskController extends GetxController{
 
     }
     _addNewTaskInProgress.value = false;
-    update();
+    notifyListeners();
     return _isSuccess.value;
 
 

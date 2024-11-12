@@ -36,7 +36,7 @@ class Routes{
       case RouteName.addNewTaskScreen:
         return MaterialPageRoute(builder: (context) => AddNewTaskScreen(),);
       case RouteName.profileScreen:
-        return MaterialPageRoute(builder: (context) => const ProfileScreen(),);
+        return MaterialPageRoute(builder: (context) => ProfileScreen(),);
       default:
         return MaterialPageRoute(builder: (context) => SignInScreen(),);
     }

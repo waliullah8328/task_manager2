@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/data/routes/route_name.dart';
-import 'package:task_manager/ui/controllers/sign_in_controller.dart';
+import '../controller/sign_in_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -15,12 +16,12 @@ class SignInScreen extends StatelessWidget {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
 
-  // Using GetX to handle TextEditingControllers via a Binding setup
-  final SignInController _controller = Get.find<SignInController>();
+
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    final controler = Provider.of<SignInProvider>(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -37,7 +38,7 @@ class SignInScreen extends StatelessWidget {
                   style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 24),
-                _buildSignInForm(context),
+                _buildSignInForm(context,controler),
                 const SizedBox(height: 24),
                 Center(
                   child: Column(
@@ -58,7 +59,7 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignInForm(BuildContext context) {
+  Widget _buildSignInForm(BuildContext context,controler) {
     return Form(
       key: _loginFormKey,
       child: Column(
@@ -92,14 +93,16 @@ class SignInScreen extends StatelessWidget {
             decoration: const InputDecoration(hintText: "Password"),
           ),
           const SizedBox(height: 24),
-          Obx(() => Visibility(
-            visible: !_controller.inProgress,
-            replacement: const Center(child: CircularProgressIndicator()),
-            child: ElevatedButton(
-              onPressed: () => _onTapNextButton(context),
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
-          )),
+          Consumer<SignInProvider>(builder: (context, value, child) {
+            return Visibility(
+              visible: !value.inProgress,
+              replacement: const Center(child: CircularProgressIndicator()),
+              child: ElevatedButton(
+                onPressed: () => _onTapNextButton(context,controler),
+                child: const Icon(Icons.arrow_circle_right_outlined),
+              ),
+            );
+          },),
         ],
       ),
     );
@@ -126,9 +129,9 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  void _onTapNextButton(BuildContext context) {
+  void _onTapNextButton(BuildContext context,controler) {
     if (!_loginFormKey.currentState!.validate()) return;
-    _signIn(context);
+    _signIn(context,controler);
   }
 
   void _onTapForgotPasswordButton(BuildContext context) {
@@ -151,8 +154,8 @@ class SignInScreen extends StatelessWidget {
     );*/
   }
 
-  Future<void> _signIn(BuildContext context) async {
-    final bool result = await _controller.signIn(
+  Future<void> _signIn(BuildContext context,controller) async {
+    final bool result = await controller.signIn(
       _emailTEController.text.trim(),
       _passwordTEController.text,
     );
@@ -161,7 +164,7 @@ class SignInScreen extends StatelessWidget {
       } else {
 
         //showSnackBarMessage(context, _controller.errorMessage, true);
-        Get.showSnackbar(GetSnackBar(title:"Error",message: _controller.errorMessage,duration: const Duration(seconds: 3),));
+        Get.showSnackbar(GetSnackBar(title:"Error",message: controller.errorMessage,duration: const Duration(seconds: 3),));
       }
 
   }

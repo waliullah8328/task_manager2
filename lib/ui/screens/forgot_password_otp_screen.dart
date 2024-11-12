@@ -2,8 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/data/routes/route_name.dart';
-import 'package:task_manager/ui/controllers/forgot_password_otp_controller.dart';
+
+import '../controller/forgot_password_otp_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -13,11 +15,12 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
 
   final _forgotOTPFormKey = GlobalKey<FormState>();
    final TextEditingController _pinVerificationTEController = TextEditingController();
-  final controller = Get.find<ForgotPasswordOtpController>();
+
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    final controller = Provider.of<ForgotPasswordOtpProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: ScreenBackground(
@@ -34,7 +37,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                   const SizedBox(
                     height: 24,
                   ),
-                  _buildVerifyEmailForm(context),
+                  _buildVerifyEmailForm(context,controller),
                   const SizedBox(
                     height: 48,
                   ),
@@ -51,7 +54,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
   }
 
 
-  Widget _buildVerifyEmailForm(BuildContext context) {
+  Widget _buildVerifyEmailForm(BuildContext context,controller) {
     return Form(
       key: _forgotOTPFormKey,
       child: Column(
@@ -85,13 +88,15 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-          Obx(() => Visibility(
-            visible: !controller.inProgress,
-            replacement: const CircularProgressIndicator(),
-            child: ElevatedButton(
-                onPressed: _onTapNextButton,
-                child: const Icon(Icons.arrow_circle_right_outlined)),
-          )),
+           Consumer<ForgotPasswordOtpProvider>(builder: (context, value, child) {
+             return Visibility(
+               visible: !value.inProgress,
+               replacement: const CircularProgressIndicator(),
+               child: ElevatedButton(
+                   onPressed: ()=>_onTapNextButton(controller),
+                   child: const Icon(Icons.arrow_circle_right_outlined)),
+             );
+           },),
         ],
       ),
     );
@@ -113,15 +118,15 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
             ]));
   }
 
-  void _onTapNextButton(){
+  void _onTapNextButton(controller){
     if(!_forgotOTPFormKey.currentState!.validate()){
       return;
     }
-    _forgotEmailAndOtp();
+    _forgotEmailAndOtp(controller);
 
   }
 
-  Future<void> _forgotEmailAndOtp()async{
+  Future<void> _forgotEmailAndOtp(controller)async{
     final bool result = await controller.forgotEmailAndOtp(otp: _pinVerificationTEController.text);
     if(result){
       //Get.to(()=>ResetPasswordScreen());

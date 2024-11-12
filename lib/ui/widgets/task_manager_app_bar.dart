@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/data/routes/route_name.dart';
-import '../controllers/auth_controller.dart';
+import '../controller/auth_controller.dart';
+
 import '../utils/app_colors.dart';
 
 
@@ -34,9 +35,10 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: AppColors.themeColor,
         title: Row(
           children: [
-            const CircleAvatar(
+             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.white,
+
               child:  Icon(Icons.person, size: 16), // Example placeholder icon
             ),
             const SizedBox(width: 16),

@@ -1,9 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_manager/ui/controllers/forgot_email_controller.dart';
+import 'package:provider/provider.dart';
+
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import '../../data/routes/route_name.dart';
+import '../controller/forgot_email_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/screen_background.dart';
 
@@ -13,10 +15,11 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
 
   final TextEditingController _emailTEController = TextEditingController();
   final _forgotEmailFormKey = GlobalKey<FormState>();
-  final controller = Get.find<ForgotEmailController>();
+
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<ForgotEmailProvider>(context);
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -38,7 +41,7 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
                   style: textTheme.titleSmall?.copyWith(color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
-                _buildVerifyEmailForm(context),
+                _buildVerifyEmailForm(context,controller),
                 const SizedBox(height: 48),
                 Center(
                   child: _buildHaveAccountSection(context),
@@ -51,7 +54,7 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVerifyEmailForm(BuildContext context) {
+  Widget _buildVerifyEmailForm(BuildContext context,controller) {
     return Form(
       key: _forgotEmailFormKey,
       child: Column(
@@ -69,14 +72,16 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
             decoration: const InputDecoration(hintText: "Email"),
           ),
           const SizedBox(height: 24),
-          Obx(() => Visibility(
-            visible: !controller.inProgress,
-            replacement: const CenterCircularProgressIndicator(),
-            child: ElevatedButton(
-              onPressed: () => _onTapNextButton(context),
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
-          )),
+          Consumer<ForgotEmailProvider>(builder: (context, value, child) {
+            return Visibility(
+              visible: !value.inProgress,
+              replacement: const CenterCircularProgressIndicator(),
+              child: ElevatedButton(
+                onPressed: () => _onTapNextButton(context,controller),
+                child: const Icon(Icons.arrow_circle_right_outlined),
+              ),
+            );
+          },),
         ],
       ),
     );
@@ -107,14 +112,14 @@ class ForgotPasswordEmailScreen extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  void _onTapNextButton(BuildContext context) {
+  void _onTapNextButton(BuildContext context,controller) {
     if (!_forgotEmailFormKey.currentState!.validate()) {
       return;
     }
-    _forgotEmail(context);
+    _forgotEmail(context,controller);
   }
 
-  Future<void> _forgotEmail(BuildContext context) async {
+  Future<void> _forgotEmail(BuildContext context,controller) async {
     final bool result = await controller.forgotEmail(email:_emailTEController.text.trim());
 
     if (result) {

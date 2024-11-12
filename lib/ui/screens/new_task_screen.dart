@@ -1,58 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/data/model/task_status_model.dart';
 import 'package:task_manager/data/routes/route_name.dart';
-import 'package:task_manager/ui/controllers/new_task_list_controller.dart';
+
+import '../controller/new_task_list_provider.dart';
 import '../widgets/list_of_task.dart';
 import '../widgets/task_summary_card.dart';
 
 
 class NewTaskScreen extends StatelessWidget {
-  NewTaskScreen({super.key});
+  const NewTaskScreen({super.key});
 
-  final NewTaskListController _controller = Get.find<NewTaskListController>();
 
 
   @override
   Widget build(BuildContext context) {
-    _controller.getNewTaskList();
-    _controller.getTaskStatusCount();
+    final newTaskProvider = Provider.of<NewTaskListProvider>(context,listen: false);
+
 
     return Scaffold(
       body: Column(
         children: [
-          GetBuilder<NewTaskListController>(
-            builder: (controller) {
-              return _buildSummarySection(controller.taskStatusCountList);
-            },
-          ), // Task summary section
+          Consumer<NewTaskListProvider>(builder: (context, value, child) {
+            return _buildSummarySection(value.taskStatusCountList);
+
+          },),
+           // Task summary section
           Expanded(
-            child: GetBuilder<NewTaskListController>(
-              builder: (controller) {
-                return Visibility(
-                  visible: !controller.inProgress,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: ListView.separated(
-                    itemCount: controller.taskList.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      return ListOfTask(
-                        taskModel: controller.taskList[index],
-                        onRefresh: () {
-                          _controller.getNewTaskList();
-                          _controller.getTaskStatusCount();
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
+            child:Consumer<NewTaskListProvider>(builder: (context, value, child) {
+              return Visibility(
+                visible: !value.inProgress,
+                replacement: const Center(child: CircularProgressIndicator()),
+                child: ListView.separated(
+                  itemCount: value.taskList.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    return ListOfTask(
+                      taskModel: value.taskList[index],
+                      onRefresh: () {
+                        value.getNewTaskList();
+                        value.getTaskStatusCount();
+                      },
+                    );
+                  },
+                ),
+              );
+            },) ,
+
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _onTapAddButton(context), // Handle add new task button
+        onPressed: () => _onTapAddButton(context,newTaskProvider), // Handle add new task button
         child: const Icon(Icons.add),
       ),
     );
@@ -82,7 +82,7 @@ class NewTaskScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _onTapAddButton(BuildContext context) async {
+  Future<void> _onTapAddButton(BuildContext context,controller) async {
     /*
     final bool? shouldRefresh = await Navigator.push(
       context,
@@ -94,8 +94,8 @@ class NewTaskScreen extends StatelessWidget {
     final bool shouldRefresh = await Get.toNamed(RouteName.addNewTaskScreen);
 
     if (shouldRefresh == true) {
-      _controller.getNewTaskList();
-      _controller.getTaskStatusCount(); // Refresh task status count as well
+      controller.getNewTaskList();
+      controller.getTaskStatusCount(); // Refresh task status count as well
     }
   }
 

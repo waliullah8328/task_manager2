@@ -1,9 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/ui/screens/sign_in_screen.dart';
-
-import '../controllers/sign_up_controller.dart';
+import '../controller/sign_up_provider.dart';
 import '../utils/app_colors.dart';
 import '../widgets/center_circular_progress_indicator.dart';
 import '../widgets/screen_background.dart';
@@ -13,11 +13,12 @@ class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
   final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
-  final controller = Get.find<SignUpController>();
+
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
+    final controller = Provider.of<SignUpProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: ScreenBackground(
@@ -38,7 +39,7 @@ class SignUpScreen extends StatelessWidget {
                   const SizedBox(
                     height: 24,
                   ),
-                  _buildSignUpForm(context),
+                  _buildSignUpForm(context,controller),
                   const SizedBox(
                     height: 24,
                   ),
@@ -52,7 +53,7 @@ class SignUpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignUpForm(BuildContext context) {
+  Widget _buildSignUpForm(BuildContext context,controller) {
     return Form(
       key: _signUpFormKey,
       child: Column(
@@ -138,14 +139,16 @@ class SignUpScreen extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-          Visibility(
-            visible: !controller.inProgress,
-            replacement: const CenterCircularProgressIndicator(),
-            child: ElevatedButton(
-              onPressed: () => _onTapNextButton(context),
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
-          ),
+          Consumer<SignUpProvider>(builder: (context, value, child) {
+            return Visibility(
+              visible: !value.inProgress,
+              replacement: const CenterCircularProgressIndicator(),
+              child: ElevatedButton(
+                onPressed: () => _onTapNextButton(context,controller),
+                child: const Icon(Icons.arrow_circle_right_outlined),
+              ),
+            );
+          },),
         ],
       ),
     );
@@ -172,14 +175,14 @@ class SignUpScreen extends StatelessWidget {
     Get.to(() => SignInScreen());
   }
 
-  void _onTapNextButton(BuildContext context) {
+  void _onTapNextButton(BuildContext context,controller) {
     if (!_signUpFormKey.currentState!.validate()) {
       return;
     }
-    _signUp(context);
+    _signUp(context,controller);
   }
 
-  Future<void> _signUp(BuildContext context) async {
+  Future<void> _signUp(BuildContext context,controller) async {
     final bool result = await controller.signUp(
 
     );

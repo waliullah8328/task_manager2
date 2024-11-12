@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../data/model/network_response.dart';
@@ -6,7 +7,11 @@ import '../../data/model/task_model.dart';
 import '../../data/service/network_caller.dart';
 import '../../data/utils/urls.dart';
 
-class ProgressTaskController extends GetxController{
+class ProgressTaskProvider with ChangeNotifier{
+
+  ProgressTaskProvider(){
+    getProgressTaskList();
+  }
 
   List<TaskModel> _progressTaskList = [];
   final RxBool _getProgressTaskInProgress = false.obs;
@@ -23,7 +28,7 @@ class ProgressTaskController extends GetxController{
   Future<bool> getProgressTaskList()async{
     _progressTaskList.clear();
     _getProgressTaskInProgress.value = true;
-    update();
+   notifyListeners();
     final NetworkResponse response = await NetworkCaller.getRequest( url: Urls.progressTaskList);
 
     if(response.isSuccess){
@@ -39,7 +44,7 @@ class ProgressTaskController extends GetxController{
 
     }
     _getProgressTaskInProgress.value = false;
-    update();
+    notifyListeners();
     return _isSuccess.value;
 
   }

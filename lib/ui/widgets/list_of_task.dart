@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager/data/model/task_model.dart';
-import '../controllers/task_edit_delete_controller.dart';
+import '../controller/task_edit_delete_provider.dart';
+
 import '../utils/app_colors.dart';
 
 class ListOfTask extends StatelessWidget {
