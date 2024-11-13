@@ -38,7 +38,7 @@ class TaskManagerAppBar extends StatelessWidget implements PreferredSizeWidget {
             const CircleAvatar(
               radius: 16,
               backgroundColor: Colors.white,
-              child: AuthController.userData!. Icon(Icons.person, size: 16), // Example placeholder icon
+              child: Icon(Icons.person, size: 16), // Example placeholder icon
             ),
             const SizedBox(width: 16),
             Expanded(
