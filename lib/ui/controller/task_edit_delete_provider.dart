@@ -1,48 +1,48 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:task_manager/data/model/network_response.dart';
 import 'package:task_manager/data/model/task_model.dart';
 import 'package:task_manager/data/service/network_caller.dart';
-import '../../data/utils/urls.dart';
+import 'package:task_manager/data/utils/urls.dart';
 
-class TaskEditDeleteController extends GetxController {
-  final _changeStatusInProgress = false.obs;
-  final _deleteTaskInProgress = false.obs;
-  final Rx<TaskModel> taskModel;
-  void Function()? onRefresh;
+class TaskProvider extends ChangeNotifier {
+  bool _changeStatusInProgress = false;
+  bool _deleteTaskInProgress = false;
+  bool get changeStatusInProgress => _changeStatusInProgress;
+  bool get deleteTaskInProgress => _deleteTaskInProgress;
 
-  bool get changeStatusInProgress => _changeStatusInProgress.value;
-  bool get deleteTaskInProgress => _deleteTaskInProgress.value;
+  Future<void> changeStatus(TaskModel task, String newStatus, VoidCallback onSuccess) async {
+    _changeStatusInProgress = true;
+    notifyListeners();
 
-  TaskEditDeleteController(this.taskModel,this.onRefresh);
-
-  Future<void> changeStatus(String newStatus) async {
-    _changeStatusInProgress.value = true;
     final NetworkResponse response = await NetworkCaller.getRequest(
-      url: Urls.updateTaskStatus(taskModel.value.sId!, newStatus),
+      url: Urls.updateTaskStatus(task.sId!, newStatus),
     );
+
     if (response.isSuccess) {
-      taskModel.value.status = newStatus;
-      taskModel.refresh();
-      onRefresh?.call();
-      Get.snackbar('Status Update', 'Task status updated successfully.');
+      onSuccess();
     } else {
-      Get.snackbar('Error', response.errorMessage);
+      // handle failure (you could add error handling here)
     }
-    _changeStatusInProgress.value = false;
+
+    _changeStatusInProgress = false;
+    notifyListeners();
   }
 
-  Future<void> deleteTask() async {
-    _deleteTaskInProgress.value = true;
+  Future<void> deleteTask(TaskModel task, VoidCallback onSuccess) async {
+    _deleteTaskInProgress = true;
+    notifyListeners();
+
     final NetworkResponse response = await NetworkCaller.getRequest(
-      url: Urls.deleteTask(taskModel.value.sId!),
+      url: Urls.deleteTask(task.sId!),
     );
+
     if (response.isSuccess) {
-      Get.back();
-      onRefresh?.call();
-      Get.snackbar('Delete', 'Task deleted successfully.');
+      onSuccess();
     } else {
-      Get.snackbar('Error', response.errorMessage);
+      // handle failure (you could add error handling here)
     }
-    _deleteTaskInProgress.value = false;
+
+    _deleteTaskInProgress = false;
+    notifyListeners();
   }
 }

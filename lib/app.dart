@@ -14,6 +14,7 @@ import 'package:task_manager/ui/controller/reset_password_provider.dart';
 import 'package:task_manager/ui/controller/sign_in_provider.dart';
 import 'package:task_manager/ui/controller/sign_up_provider.dart';
 import 'package:task_manager/ui/controller/splash_provider.dart';
+import 'package:task_manager/ui/controller/task_edit_delete_provider.dart';
 import 'package:task_manager/ui/utils/app_colors.dart';
 import 'data/model/task_model.dart';
 import 'data/routes/route.dart';
@@ -49,6 +50,7 @@ class _TaskManagerAppState extends State<TaskManagerApp> {
       ChangeNotifierProvider(create: (context) => ForgotEmailProvider(),),
       ChangeNotifierProvider(create: (context) => ResetPasswordProvider(),),
       ChangeNotifierProvider(create: (context) => BottomNavBarProvider(),),
+      ChangeNotifierProvider(create: (context) => TaskProvider(),),
 
 
 
